@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix GitHub AI Terminal</title>
+    <style>
+        /* This keeps the canvas completely in the background */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Pushes it behind everything else */
+        }
+
+        body { 
+            background-color: #030303; 
+            color: #00FF33; 
+            font-family: 'Courier New', Courier, monospace; 
+            max-width: 700px; 
+            margin: 50px auto; 
+            padding: 20px;
+            text-shadow: 0 0 5px #00FF33;
+            position: relative;
+        }
+
+        /* Makes the terminal wrapper solid so the rain drops pass behind it nicely */
+        .terminal-container {
+            background-color: rgba(3, 3, 3, 0.9); /* Slight fade so background is subtly visible */
+            padding: 30px;
+            border: 2px solid #00FF33;
+            box-shadow: 0 0 20px #00FF33;
+            border-radius: 5px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 3px;
+            border-bottom: 2px solid #00FF33;
+            padding-bottom: 10px;
+            margin-top: 0;
+            animation: blink 1.5s infinite;
+        }
+
+        p {
+            color: #88FF88;
+        }
+
+        input { 
+            background-color: #111;
+            color: #00FF33;
+            border: 2px solid #00FF33;
+            padding: 12px; 
+            width: 65%; 
+            font-size: 16px; 
+            font-family: 'Courier New', Courier, monospace;
+            outline: none;
+            box-shadow: 0 0 10px #00FF33;
+        }
+
+        button { 
+            background-color: #00FF33;
+            color: #000;
+            border: none;
+            padding: 14px 25px; 
+            font-size: 16px; 
+            font-weight: bold;
+            font-family: 'Courier New', Courier, monospace;
+            cursor: pointer; 
+            box-shadow: 0 0 15px #00FF33;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #000;
+            color: #00FF33;
+            border: 2px solid #00FF33;
+            box-shadow: 0 0 25px #00FF33;
+        }
+
+        #results { 
+            margin-top: 30px; 
+            padding: 20px; 
+            border: 2px dashed #00FF33; 
+            min-height: 150px; 
+            text-align: left; 
+            background: #050505; 
+            box-shadow: inset 0 0 10px #00FF33;
+            line-height: 1.6;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrixCanvas"></canvas>
+
+    <div class="terminal-container">
+        <h1>[ SYSTEM: AI_TEK_FINDER ]</h1>
+        <p>>_ Enter target technology query to search the GitHub database...</p>
+        
+        <input type="text" id="userInput" placeholder="Construct query... e.g., neural network">
+        <button onclick="searchTech()">EXECUTE</button>
+
+        <h3>[ TERMINAL OUTPUT ]</h3>
+        <div id="results">SYSTEM READY. AWAITING INPUT...</div>
+    </div>
+
+    <script>
+        // --- PART 1: THE AI AGENT SEARCH SYSTEM ---
+        function searchTech() {
+            const query = document.getElementById('userInput').value;
+            const resultsDiv = document.getElementById('results');
+            
+            if(!query) {
+                alert("ERROR: Input query is empty.");
+                return;
+            }
+            
+            resultsDiv.innerHTML = `
+                <span style="color: red;">[!] WARNING: Accessing GitHub API...</span><br>
+                <span>[i] Analyzing request: "${query}"</span><br>
+                <span>[i] Deploying AI Agent into the Matrix...</span>
+            `;
+
+            fetch(`http://127.0.0.1:8000/search?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = data.results;
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = "<span style='color: red;'>[-] ERROR: Could not connect to the Python backend core. Make sure main.py is running!</span>";
+                });
+        }
+
+        // --- PART 2: THE MATRIX DIGITAL RAIN SIMULATION ---
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function setCanvasSize() {
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン'.split('');
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0'; 
+            ctx.font = `${fontSize}px Courier New`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+    </script>
+
+</body>
+</html>
