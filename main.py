@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import datetime
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -33,12 +34,24 @@ def search():
     
     gh_search_url = f"https://api.github.com/search/repositories?q={query}&sort=stars&order=desc&per_page=3"
     
+    # Base headers
+    headers = {"Accept": "application/vnd.github.v3+json"}
+    
+    # Securely grab the VIP pass from Render
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        headers['Authorization'] = f"token {github_token}"
+    
     try:
-        response = requests.get(gh_search_url, headers={"Accept": "application/vnd.github.v3+json"})
+        response = requests.get(gh_search_url, headers=headers)
         data = response.json()
         
-        if 'items' not in data or len(data['items']) == 0:
-            return jsonify({"results": "<span style='color: yellow;'>[!] NO TARGETS FOUND.</span>"})
+        if 'items' not in data:
+            error_msg = data.get('message', 'Unknown GitHub interference.')
+            return jsonify({"results": f"<span style='color: yellow;'>[!] GITHUB FIREWALL: {error_msg}</span>"})
+            
+        if len(data['items']) == 0:
+            return jsonify({"results": f"<span style='color: yellow;'>[!] NO TARGETS FOUND for '{query}'.</span>"})
         
         results_html = f"<span style='color: #00ff00;'>[+] MAINFRAME QUERY: '{query}'</span><br><br>"
 
@@ -46,10 +59,8 @@ def search():
             health = calculate_health(repo)
             color = "#00ff00" if health > 70 else "#ffff00" if health > 40 else "#ff0000"
             
-            # Grabs the actual GitHub website link
             repo_url = repo.get('html_url', '#')
             
-            # Wraps the target name in a clickable HTML link that opens in a new tab
             results_html += f"<span style='color: {color};'>TARGET: <a href='{repo_url}' target='_blank' style='color: {color}; text-decoration: underline;'>{repo['full_name']}</a></span><br>"
             results_html += f"<span>HEALTH SCORE: {health}/100</span><br>"
             results_html += f"<span>STARS: {repo['stargazers_count']}</span><br>"
