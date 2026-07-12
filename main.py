@@ -51,15 +51,14 @@ def search():
         if len(data['items']) == 0:
             return jsonify({"results": f"<span style='color: yellow;'>[!] NO TARGETS FOUND for '{query}'.</span>"})
         
-        results_html = f"<span style='color: #00ff00;'>[+] MAINFRAME QUERY: '{query}'</span><br><br>"
+        # Updated to say TEKFINDER QUERY
+        results_html = f"<span style='color: #00ff00;'>[+] TEKFINDER QUERY: '{query}'</span><br><br>"
 
         for repo in data['items']:
             health = calculate_health(repo)
             color = "#00ff00" if health > 70 else "#ffff00" if health > 40 else "#ff0000"
             
             repo_url = repo.get('html_url', '#')
-            
-            # Safely grab the project summary description
             description = repo.get('description', 'No description provided by the developer.')
             
             results_html += f"<span style='color: {color};'>TARGET: <a href='{repo_url}' target='_blank' style='color: {color}; text-decoration: underline;'>{repo['full_name']}</a></span><br>"
