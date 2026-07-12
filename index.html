@@ -151,4 +151,35 @@
         setCanvasSize();
         window.addEventListener('resize', setCanvasSize);
 
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ã‚¢ã‚¡ã‚«ã‚µã‚¿ãƒŠãƒãƒžãƒ¤ãƒ£ãƒ©ãƒ¯ã‚¬ã‚¶ãƒ€ãƒãƒ‘ã‚¤ã‚£ã‚­ã‚·ãƒãƒ‹
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ã‚¢ã‚¡ã‚«ã‚µã‚¿ãƒŠãƒãƒžãƒ¤ãƒ£ãƒ©ãƒ¯ã‚¬ã‚¶ãƒ€ãƒãƒ‘ã‚¤ã‚£ã‚­ã‚·ãƒãƒ‹ãƒ’ãƒŸãƒªãƒ°ã‚®ã‚¸ãƒ‚ãƒ“ãƒ”ã‚¦ã‚¥ã‚¯ã‚¹ãƒ„ãƒŒãƒ•ãƒ ãƒ¦ãƒ¥ãƒ«ã‚°ã‚ºãƒ–ãƒ…ãƒ—ã‚¨ã‚§ã‚±ã‚»ãƒ†ãƒãƒ˜ãƒ¡ãƒ¬ãƒ±ã‚²ã‚¼ãƒ‡ãƒ™ãƒšã‚ªã‚©ã‚³ã‚½ãƒˆãƒŽãƒ›ãƒ¢ãƒ¨ãƒ§ãƒ­ãƒ²ã‚´ã‚¾ãƒ‰ãƒœãƒãƒ´ãƒƒãƒ³'.split('');
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0'; 
+            ctx.font = `${fontSize}px Courier New`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 33);
+    </script>
+
+</body>
+</html>
