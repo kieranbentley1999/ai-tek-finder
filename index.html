@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Matrix GitHub AI Terminal</title>
     <style>
-        /* This keeps the canvas completely in the background */
         #matrixCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1; /* Pushes it behind everything else */
+            z-index: -1;
         }
 
         body { 
@@ -26,9 +25,8 @@
             position: relative;
         }
 
-        /* Makes the terminal wrapper solid so the rain drops pass behind it nicely */
         .terminal-container {
-            background-color: rgba(3, 3, 3, 0.9); /* Slight fade so background is subtly visible */
+            background-color: rgba(3, 3, 3, 0.9); 
             padding: 30px;
             border: 2px solid #00FF33;
             box-shadow: 0 0 20px #00FF33;
@@ -89,6 +87,7 @@
             background: #050505; 
             box-shadow: inset 0 0 10px #00FF33;
             line-height: 1.6;
+            word-wrap: break-word;
         }
 
         @keyframes blink {
@@ -113,7 +112,32 @@
     </div>
 
     <script>
-        // --- PART 1: THE AI AGENT SEARCH SYSTEM ---
+        // --- TYPING ENGINE ---
+        function typeEffect(element, htmlString, speed = 15) {
+            element.innerHTML = "";
+            let i = 0;
+            let currentText = "";
+            
+            // This helper function parses out HTML tags like <br> and <span> so they don't break the animation
+            function step() {
+                if (i < htmlString.length) {
+                    if (htmlString[i] === '<') {
+                        let tagEnd = htmlString.indexOf('>', i);
+                        if (tagEnd !== -1) {
+                            currentText += htmlString.substring(i, tagEnd + 1);
+                            i = tagEnd + 1;
+                        }
+                    } else {
+                        currentText += htmlString[i];
+                        i++;
+                    }
+                    element.innerHTML = currentText;
+                    setTimeout(step, speed);
+                }
+            }
+            step();
+        }
+
         function searchTech() {
             const query = document.getElementById('userInput').value;
             const resultsDiv = document.getElementById('results');
@@ -129,18 +153,18 @@
                 <span>[i] Deploying AI Agent into the Matrix...</span>
             `;
 
-            // Completely routed globally to Render backend architecture
             fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
-                    resultsDiv.innerHTML = data.results;
+                    // Triggers the typewriter engine animation
+                    typeEffect(resultsDiv, data.results, 10);
                 })
                 .catch(error => {
-                    resultsDiv.innerHTML = "<span style='color: red;'>[-] ERROR: Could not connect to the Python backend core. Make sure main.py is running!</span>";
+                    resultsDiv.innerHTML = "<span style='color: red;'>[-] ERROR: Could not connect to the Python backend core.</span>";
                 });
         }
 
-        // --- PART 2: THE MATRIX DIGITAL RAIN SIMULATION ---
+        // --- MATRIX BACKGROUND ---
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -151,35 +175,4 @@
         setCanvasSize();
         window.addEventListener('resize', setCanvasSize);
 
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ã‚¢ã‚¡ã‚«ã‚µã‚¿ãƒŠãƒãƒžãƒ¤ãƒ£ãƒ©ãƒ¯ã‚¬ã‚¶ãƒ€ãƒãƒ‘ã‚¤ã‚£ã‚­ã‚·ãƒãƒ‹ãƒ’ãƒŸãƒªãƒ°ã‚®ã‚¸ãƒ‚ãƒ“ãƒ”ã‚¦ã‚¥ã‚¯ã‚¹ãƒ„ãƒŒãƒ•ãƒ ãƒ¦ãƒ¥ãƒ«ã‚°ã‚ºãƒ–ãƒ…ãƒ—ã‚¨ã‚§ã‚±ã‚»ãƒ†ãƒãƒ˜ãƒ¡ãƒ¬ãƒ±ã‚²ã‚¼ãƒ‡ãƒ™ãƒšã‚ªã‚©ã‚³ã‚½ãƒˆãƒŽãƒ›ãƒ¢ãƒ¨ãƒ§ãƒ­ãƒ²ã‚´ã‚¾ãƒ‰ãƒœãƒãƒ´ãƒƒãƒ³'.split('');
-        const fontSize = 14;
-        let columns = canvas.width / fontSize;
-        let drops = [];
-
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-
-        function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#0F0'; 
-            ctx.font = `${fontSize}px Courier New`;
-
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-
-        setInterval(draw, 33);
-    </script>
-
-</body>
-</html>
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ã
