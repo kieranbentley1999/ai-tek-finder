@@ -34,10 +34,8 @@ def search():
     
     gh_search_url = f"https://api.github.com/search/repositories?q={query}&sort=stars&order=desc&per_page=3"
     
-    # Base headers
     headers = {"Accept": "application/vnd.github.v3+json"}
     
-    # Securely grab the VIP pass from Render
     github_token = os.environ.get('GITHUB_TOKEN')
     if github_token:
         headers['Authorization'] = f"token {github_token}"
@@ -61,7 +59,11 @@ def search():
             
             repo_url = repo.get('html_url', '#')
             
+            # Safely grab the project summary description
+            description = repo.get('description', 'No description provided by the developer.')
+            
             results_html += f"<span style='color: {color};'>TARGET: <a href='{repo_url}' target='_blank' style='color: {color}; text-decoration: underline;'>{repo['full_name']}</a></span><br>"
+            results_html += f"<span style='color: #aaa;'>INFO: {description}</span><br>"
             results_html += f"<span>HEALTH SCORE: {health}/100</span><br>"
             results_html += f"<span>STARS: {repo['stargazers_count']}</span><br>"
             results_html += "<span style='color: #444;'>--------------------------</span><br><br>"
