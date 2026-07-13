@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEKFINDER Systems Documentation</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000; color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        .terminal-container {
+            position: relative; z-index: 10; 
+            background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 800px; padding: 35px 30px;
+        }
+        .corner {
+            position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
+        }
+        .c-tl { top: -9px; left: -6px; padding: 0 4px; }
+        .c-tr { top: -9px; right: -6px; padding: 0 4px; }
+        .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
+        .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
+        
+        h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
+        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
+        .back-link:hover { background: #00ff00; color: #000; }
+        
+        .docs-body {
+            border: 1px dashed rgba(0, 255, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 25px;
+            height: 380px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        h2 { font-size: 1.1rem; color: #fff; margin-top: 20px; margin-bottom: 8px; border-bottom: 1px solid rgba(0, 255, 0, 0.3); padding-bottom: 4px; }
+        h2:first-of-type { margin-top: 0; }
+        p { margin-bottom: 15px; color: #00ff00; }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+        li { margin-bottom: 5px; color: #aaa; }
+        strong { color: #00ff00; }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="terminal-container">
+        <span class="corner c-tl">+</span>
+        <span class="corner c-tr">+</span>
+        <span class="corner c-bl">+</span>
+        <span class="corner c-br">+</span>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
+        <h1>> SYSTEM DOCUMENTATION _</h1>
+        <br>
+        <div class="docs-body">
+            <h2>1. OVERVIEW</h2>
+            <p><strong>TEKFINDER ($TEKFIND)</strong> is a decentralized, terminal-styled intelligence suite engineered to analyze open-source codebases, index development trends, and scan global file networks to keep builders safe and updated.</p>
+            
+            <h2>2. PLATFORM UTILITY</h2>
+            <ul>
+                <li><strong>TEK FINDER:</strong> Connects to the GitHub API to crawl repositories, evaluate live code architecture, calculate active health rankings, and track developers' community engagement metrics.</li>
+                <li><strong>APK / API FINDER:</strong> Acts as an autonomous agent that searches multi-index repositories to verify, categorize, and safety-score downloadable application files and connection protocols.</li>
+            </ul>
+
+            <h2>3. TOKENOMICS ($TEKFIND)</h2>
+            <p>The native utility token powers the ecosystem. In upcoming releases, holding $TEKFIND will unlock advanced, zero-limit scanning pipelines, premium API keys, and custom interface layers.</p>
+            <ul>
+                <li><strong>Token Name:</strong> TEKFINDER</li>
+                <li><strong>Ticker:</strong> $TEKFIND</li>
+                <li><strong>Launch Platform:</strong> pump.fun</li>
+            </ul>
+
+            <h2>4. DEVELOPMENT ROADMAP</h2>
+            <ul>
+                <li><strong>Phase 1:</strong> Portal launch and community activation (Completed).</li>
+                <li><strong>Phase 2:</strong> Deployment of separate scanner sub-systems (Active).</li>
+                <li><strong>Phase 3:</strong> API key integration for zero-limit community searching.</li>
+                <li><strong>Phase 4:</strong> Private beta for native desktop and mobile interface ports.</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+        canvas.height = window.innerHeight; canvas.width = window.innerWidth;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
+            drops.forEach((y, i) => {
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+            });
+        }
+        setInterval(draw, 35);
+    </script>
+</body>
+</html>

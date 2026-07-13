@@ -30,8 +30,8 @@
             background-color: rgba(0, 0, 0, 0.85);
             border: 1px solid #00ff00; 
             box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
-            width: 90%;
-            max-width: 750px;
+            width: 95%;
+            max-width: 900px;
             padding: 35px 30px;
         }
         .corner {
@@ -63,22 +63,26 @@
         }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* Updated Grid for 3 Cards */
         .hub-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
             margin-top: 10px;
             min-height: 220px;
-            align-items: center;
+            align-items: stretch;
         }
         .hub-card {
             background: rgba(0, 20, 0, 0.3);
             border: 1px solid rgba(0, 255, 0, 0.4);
-            padding: 25px 20px;
+            padding: 25px 15px;
             text-align: center;
             text-decoration: none;
             color: #00ff00;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             transition: all 0.3s ease;
         }
         .hub-card:hover {
@@ -88,12 +92,12 @@
             transform: translateY(-2px);
         }
         .hub-card h2 {
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             margin-bottom: 12px;
             letter-spacing: 1px;
         }
         .hub-card p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #aaa;
             line-height: 1.4;
         }
@@ -111,13 +115,20 @@
         <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $TEKFIND</div>
         
         <div class="hub-grid">
+            <!-- Card 1: GitHub Platform -->
             <a href="tek.html" class="hub-card">
                 <h2>[ TEK FINDER ]</h2>
-                <p>Launch the global search engine to map general open-source applications and repository health health frameworks.</p>
+                <p>Launch global queries to analyze open-source code and track repository health ratings.</p>
             </a>
+            <!-- Card 2: APK Platform -->
             <a href="apk.html" class="hub-card">
                 <h2>[ APK/API FINDER ]</h2>
-                <p>Launch the targeted asset tracker. Scans the web environment directly for active mobile application packages.</p>
+                <p>Track live application packages and check safety integrity ratings across the web.</p>
+            </a>
+            <!-- Card 3: Project Documentation (NEW) -->
+            <a href="docs.html" class="hub-card">
+                <h2>[ SYSTEM DOCS ]</h2>
+                <p>Review the master blueprint, whitepaper, token utility mechanics, and the roadmap.</p>
             </a>
         </div>
     </div>
