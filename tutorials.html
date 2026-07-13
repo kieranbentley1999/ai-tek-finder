@@ -152,4 +152,17 @@
         
         const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01234
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
+            drops.forEach((y, i) => {
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+            });
+        }
+        setInterval(draw, 35);
+    </script>
+</body>
+</html>
