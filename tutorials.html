@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial Search Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000; color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        .terminal-container {
+            position: relative; z-index: 10; 
+            background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 700px; padding: 35px 30px;
+        }
+        .corner {
+            position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
+        }
+        .c-tl { top: -9px; left: -6px; padding: 0 4px; }
+        .c-tr { top: -9px; right: -6px; padding: 0 4px; }
+        .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
+        .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
+        h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
+        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
+        .back-link:hover { background: #00ff00; color: #000; }
+        .input-group { display: flex; gap: 10px; width: 100%; margin-bottom: 15px;}
+        input { flex: 1; background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 12px 15px; font-size: 1.1rem; font-family: 'Courier New', Courier, monospace; outline: none; }
+        button.execute-btn { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        button.execute-btn:hover { background-color: #00ff00; color: #000; }
+        #results { border: 1px dashed rgba(0, 255, 0, 0.5); background-color: rgba(0, 0, 0, 0.6); padding: 20px; min-height: 150px; max-height: 200px; overflow-y: auto; font-size: 0.95rem; }
+
+        /* MOBILE RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            body {
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 15px;
+            }
+            .terminal-container {
+                width: calc(100% - 30px);
+                margin: 20px auto;
+                padding: 25px 15px;
+            }
+            h1 {
+                font-size: 1.4rem;
+                letter-spacing: 1px;
+            }
+            .back-link {
+                margin-bottom: 15px;
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
+            .input-group {
+                flex-direction: column; 
+                gap: 10px;
+            }
+            input {
+                width: 100%;
+                font-size: 1rem;
+            }
+            button.execute-btn {
+                width: 100%;
+                padding: 12px;
+            }
+            #results {
+                min-height: 220px; 
+                max-height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="terminal-container">
+        <span class="corner c-tl">+</span>
+        <span class="corner c-tr">+</span>
+        <span class="corner c-bl">+</span>
+        <span class="corner c-br">+</span>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
+        <h1>> TUTORIAL AGENT CORE _</h1>
+        <br>
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="What do you want to build?">
+            <button onclick="searchTutorial()" class="execute-btn">[ EXTRACT ]</button>
+        </div>
+        <h3>[ AI AGENT MESH OUTPUT ]</h3>
+        <div id="results">AWAITING SYSTEM PARAMETERS...</div>
+    </div>
+    <script>
+        function searchTutorial() {
+            const query = document.getElementById('userInput').value;
+            const resultsDiv = document.getElementById('results');
+            if(!query) return;
+            resultsDiv.innerHTML = "<span>[+] Parsing Global Intelligence Documentation Indexes...</span>";
+            fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query + ' tutorial guides')}`)
+                .then(r => r.json()).then(d => { resultsDiv.innerHTML = d.results; });
+        }
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+        canvas.height = window.innerHeight; canvas.width = window.innerWidth;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
+            drops.forEach((y, i) => {
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+            });
+        }
+        setInterval(draw, 35);
+    </script>
+</body>
+</html>
