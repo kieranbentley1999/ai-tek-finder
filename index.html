@@ -197,6 +197,7 @@
         <h1>> TEKFINDER MAINFRAME <span class="cursor">_</span></h1>
         <div class="subtitle">CORE INTELLIGENCE HUB // WELCOME USER // $TEKFIND</div>
         
+        <!-- PANEL 1: CENTRAL MAIN HUB (Gateway View) -->
         <div id="hubPanel" class="view-panel active">
             <div class="hub-grid">
                 <div class="hub-card" onclick="switchView('scanner')">
@@ -210,24 +211,26 @@
             </div>
         </div>
 
+        <!-- PANEL 2: TEK FINDER Console -->
         <div id="scannerPanel" class="view-panel">
             <button class="back-btn" onclick="switchView('hub')">&lt;&lt; RETURN TO MAIN HUB</button>
             <div class="search-wrapper">
                 <div class="input-group">
                     <input type="text" id="userInput" placeholder="search://general-tech">
-                    <button onclick="executeGeneralSearch()" class="execute-btn">[ SEARCH ]</button>
+                    <button onclick="searchTech('general')" class="execute-btn">[ SEARCH ]</button>
                 </div>
             </div>
             <h3>[ GENERAL ARCHITECTURE SCANNER ]</h3>
             <div id="results" class="results-box">SYSTEM READY. AWAITING TARGET INPUT...</div>
         </div>
 
+        <!-- PANEL 3: APK/API FINDER Console -->
         <div id="binariesPanel" class="view-panel">
             <button class="back-btn" onclick="switchView('hub')">&lt;&lt; RETURN TO MAIN HUB</button>
             <div class="search-wrapper">
                 <div class="input-group">
                     <input type="text" id="apkInput" placeholder="search://apk-or-api">
-                    <button onclick="executeApkSearch()" class="execute-btn">[ SCAN APK/API ]</button>
+                    <button onclick="searchTech('apk')" class="execute-btn">[ SCAN APK/API ]</button>
                 </div>
             </div>
             <h3>[ DEPLOYING TARGETED APK & BINARY LOCATOR ]</h3>
@@ -284,10 +287,20 @@
             }
         }
 
-        // 1. Completely Clean General Search (Matches your original working setup)
-        function executeGeneralSearch() {
-            const query = document.getElementById('userInput').value;
-            const resultsDiv = document.getElementById('results');
+        // Smarter search function handling both general search and APK-specific filtering
+        function searchTech(mode) {
+            let query = "";
+            let resultsDiv = null;
+
+            if (mode === 'general') {
+                query = document.getElementById('userInput').value;
+                resultsDiv = document.getElementById('results');
+            } else {
+                // If it's the APK finder, automatically attach qualifiers to target repositories containing code assets or build configurations
+                const userText = document.getElementById('apkInput').value;
+                query = userText ? `${userText} apk OR api` : "";
+                resultsDiv = document.getElementById('apkResults');
+            }
             
             if(!query) {
                 playBeep(200, 'sawtooth', 300);
@@ -296,43 +309,45 @@
             }
             
             playBeep(400, 'square', 150);
-            resultsDiv.innerHTML = "<span style='color: #00ff00;'>[+] INITIATING PROTOCOL...</span><br><span>[+] Parsing intent...</span><br><span>[+] Accessing Core Mainframe...</span>";
+            resultsDiv.innerHTML = "<span style='color: #00ff00;'>[+] INITIATING PROTOCOL...</span><br><span>[+] Filtering for binary tags...</span><br><span>[+] Accessing Core Mainframe...</span>";
 
-            sendRequest(query, resultsDiv);
-        }
-
-        // 2. Separate APK Search that doesn't mess with the general scanner
-        function executeApkSearch() {
-            const userText = document.getElementById('apkInput').value;
-            const resultsDiv = document.getElementById('apkResults');
-            
-            if(!userText) {
-                playBeep(200, 'sawtooth', 300);
-                resultsDiv.innerHTML = "<span style='color: red;'>[-] ERROR: Input query is empty.</span>";
-                return;
-            }
-            
-            // Cleaned up formatting so GitHub doesn't drop the connection
-            const query = userText + " apk";
-            
-            playBeep(400, 'square', 150);
-            resultsDiv.innerHTML = "<span style='color: #00ff00;'>[+] INITIATING TARGETED BINARY SCAN...</span><br><span>[+] Filtering for mobile packages...</span><br><span>[+] Accessing Core Mainframe...</span>";
-
-            sendRequest(query, resultsDiv);
-        }
-
-        // Helper function to process requests cleanly
-        function sendRequest(finalQuery, displayElement) {
-            fetch('https://ai-tek-finder.onrender.com/search?query=' + encodeURIComponent(finalQuery))
+            fetch('https://ai-tek-finder.onrender.com/search?query=' + encodeURIComponent(query))
                 .then(response => response.json())
                 .then(data => {
                     playBeep(800, 'sine', 200);
-                    displayElement.innerHTML = data.results;
+                    resultsDiv.innerHTML = data.results;
                 })
                 .catch(error => {
                     playBeep(200, 'sawtooth', 400);
-                    displayElement.innerHTML = "<span style='color: red;'>[-] FATAL ERROR: Backend disconnected. Check terminal.</span>";
+                    resultsDiv.innerHTML = "<span style='color: red;'>[-] FATAL ERROR: Backend disconnected. Check terminal.</span>";
                 });
         }
 
         const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        function setCanvasSize() { canvas.height = window.innerHeight; canvas.width = window.innerWidth; }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
+        
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        const fontSize = 16;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = [];
+        for (let x = 0; x < columns; x++) { drops[x] = 1; }
+        
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; 
+            ctx.font = 'bold ' + fontSize + 'px Courier New';
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) { drops[i] = 0; }
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 35);
+    </script>
+</body>
+</html>
