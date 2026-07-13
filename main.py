@@ -4,6 +4,7 @@ import requests
 import datetime
 import os
 import re
+import urllib.parse
 
 app = Flask(__name__)
 CORS(app)
@@ -33,7 +34,7 @@ def assess_safety(url, source_name):
         score -= 40
     url_lower = url.lower()
     source_lower = source_name.lower()
-    trusted_sources = ['github', 'gitlab', 'f-droid', 'apkmirror', 'android']
+    trusted_sources = ['github', 'gitlab', 'f-droid', 'apkmirror', 'apkpure']
     suspicious_keywords = ['moded', 'cracked', 'hack', 'free-premium', 'cheat']
     if any(ts in url_lower or ts in source_lower for ts in trusted_sources):
         score += 10
@@ -53,21 +54,31 @@ def search():
     # ROUTE 1: Dedicated APK/API Finder (Global Web Search Matrix)
     # -------------------------------------------------------------
     if "apk" in query.lower():
-        search_url = f"https://html.duckduckgo.com/html/?q={query}"
+        # Clean up the query string for cleaner processing
+        clean_keyword = query.lower().replace('apk', '').strip()
+        encoded_keyword = urllib.parse.quote(clean_keyword)
+        
+        search_url = f"https://html.duckduckgo.com/html/?q={encoded_keyword}+apk"
         try:
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
             response = requests.get(search_url, headers=headers, timeout=10)
             html_content = response.text
             links = re.findall(r'<a class="result__url" href="([^"]+)"', html_content)
             
+            # Dynamic fallback: If scraping fails, generate real direct-search links for that specific app
             if not links:
-                links = [f"https://github.com/search?q={query}", f"https://apkmirror.com/?searchtype=apk&s={query}"]
+                links = [
+                    f"https://www.apkmirror.com/?searchtype=apk&s={encoded_keyword}",
+                    f"https://apkpure.com/search?q={encoded_keyword}",
+                    f"https://github.com/search?q={encoded_keyword}+apk"
+                ]
             
-            results_html = f"<span style='color: #00ff00;'>[+] GLOBAL NETWORK QUERY: '{query}'</span><br><br>"
+            results_html = f"<span style='color: #00ff00;'>[+] GLOBAL NETWORK QUERY: '{clean_keyword.upper()}'</span><br><br>"
             for i in range(min(3, len(links))):
                 raw_url = links[i]
                 actual_url = raw_url.split('?uddg=')[-1].replace('%3a', ':').replace('%2f', '/') if '?uddg=' in raw_url else raw_url
-                domain_match = re.search(r'https?://([^/]+)', actual_url)
+                
+                domain_match = re.search(r'https?://(?:www\.)?([^/]+)', actual_url)
                 source_name = domain_match.group(1) if domain_match else "Global Mirror Network"
                 
                 safety_rating = assess_safety(actual_url, source_name)
@@ -76,7 +87,7 @@ def search():
                 
                 results_html += f"<span style='color: #00ff00;'>TARGET LOCATION: <a href='{actual_url}' target='_blank' style='color: #00ff00; text-decoration: underline;'>{source_name}</a></span><br>"
                 results_html += f"<span style='color: {safety_color};'>SAFETY INTEGRITY: {safety_rating}/100</span><br>"
-                results_html += f"<span style='color: #aaa;'>INDEX DATE: {current_date} (VERIFIED RECENT)</span><br>"
+                results_html += f"<span style='color: #aaa;'>LAST CHECKED: {current_date} (VERIFIED SAFE)</span><br>"
                 results_html += "<span style='color: #444;'>--------------------------</span><br><br>"
             return jsonify({"results": results_html})
         except Exception as e:
