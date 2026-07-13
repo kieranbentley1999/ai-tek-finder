@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEKFINDER Central Mainframe | $TEKFIND</title>
+    <title>TEKFINDER Mainframe Hub | $TEKFIND</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             background-color: #000; 
             color: #00ff00;
@@ -17,7 +16,6 @@
             justify-content: center;
             align-items: center;
         }
-
         #matrixCanvas {
             position: fixed;
             top: 0;
@@ -26,7 +24,6 @@
             height: 100vh;
             z-index: 1; 
         }
-
         .terminal-container {
             position: relative;
             z-index: 10; 
@@ -37,7 +34,6 @@
             max-width: 750px;
             padding: 35px 30px;
         }
-
         .corner {
             position: absolute;
             color: #00ff00;
@@ -49,7 +45,6 @@
         .c-tr { top: -9px; right: -6px; padding: 0 4px; }
         .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
         .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
-
         h1 { 
             font-size: 1.8rem; 
             font-weight: bold; 
@@ -58,7 +53,6 @@
             text-shadow: 0 0 8px #00ff00;
             text-align: center;
         }
-        
         .subtitle {
             color: #00ff00;
             opacity: 0.7;
@@ -67,14 +61,8 @@
             margin-bottom: 30px;
             text-align: center;
         }
-
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        .view-panel { display: none; }
-        .view-panel.active { display: block; }
-
-        /* MAIN HUB SCREEN GRID */
         .hub-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -83,111 +71,36 @@
             min-height: 220px;
             align-items: center;
         }
-
         .hub-card {
             background: rgba(0, 20, 0, 0.3);
             border: 1px solid rgba(0, 255, 0, 0.4);
             padding: 25px 20px;
             text-align: center;
-            cursor: pointer;
+            text-decoration: none;
+            color: #00ff00;
+            display: block;
             transition: all 0.3s ease;
         }
-
         .hub-card:hover {
             background: rgba(0, 255, 0, 0.1);
             border-color: #00ff00;
             box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
             transform: translateY(-2px);
         }
-
         .hub-card h2 {
             font-size: 1.3rem;
             margin-bottom: 12px;
             letter-spacing: 1px;
         }
-
         .hub-card p {
             font-size: 0.85rem;
             color: #aaa;
             line-height: 1.4;
         }
-
-        /* BACK BUTTON */
-        .back-btn {
-            display: inline-block;
-            background: transparent;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 5px 12px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.8rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 20px;
-        }
-        .back-btn:hover {
-            background: #00ff00;
-            color: #000;
-        }
-
-        /* SEARCH TERMINAL UI */
-        .input-group { display: flex; gap: 10px; width: 100%; margin-bottom: 15px;}
-        input {
-            flex: 1;
-            background-color: transparent;
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 12px 15px;
-            font-size: 1.1rem;
-            font-family: 'Courier New', Courier, monospace;
-            outline: none;
-        }
-        input::placeholder { color: rgba(0, 255, 0, 0.4); }
-
-        button.execute-btn {
-            background-color: transparent;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            font-family: 'Courier New', Courier, monospace;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        button.execute-btn:hover { background-color: #00ff00; color: #000; }
-
-        h3 { font-size: 1.1rem; margin: 25px 0 15px 0; letter-spacing: 1px; }
-
-        .results-box {
-            border: 1px dashed rgba(0, 255, 0, 0.5);
-            background-color: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            min-height: 180px;
-            max-height: 220px;
-            overflow-y: auto;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .mute-btn {
-            position: absolute;
-            bottom: -45px;
-            right: 0;
-            background: #000;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            padding: 5px 10px;
-            font-family: 'Courier New', Courier, monospace;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        .mute-btn:hover { background: #00ff00; color: #000; }
     </style>
 </head>
 <body>
     <canvas id="matrixCanvas"></canvas>
-
     <div class="terminal-container">
         <span class="corner c-tl">+</span>
         <span class="corner c-tr">+</span>
@@ -195,157 +108,34 @@
         <span class="corner c-br">+</span>
 
         <h1>> TEKFINDER MAINFRAME <span class="cursor">_</span></h1>
-        <div class="subtitle">CORE INTELLIGENCE HUB // WELCOME USER // $TEKFIND</div>
+        <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $TEKFIND</div>
         
-        <!-- PANEL 1: CENTRAL MAIN HUB (Gateway View) -->
-        <div id="hubPanel" class="view-panel active">
-            <div class="hub-grid">
-                <div class="hub-card" onclick="switchView('scanner')">
-                    <h2>[ TEK FINDER ]</h2>
-                    <p>Execute global queries to map general open-source applications and technology frameworks.</p>
-                </div>
-                <div class="hub-card" onclick="switchView('binaries')">
-                    <h2>[ APK/API FINDER ]</h2>
-                    <p>Targeted tracking console. Specifically scans for compiled Android packages and application interface scripts.</p>
-                </div>
-            </div>
+        <div class="hub-grid">
+            <a href="tek.html" class="hub-card">
+                <h2>[ TEK FINDER ]</h2>
+                <p>Launch the global search engine to map general open-source applications and repository health health frameworks.</p>
+            </a>
+            <a href="apk.html" class="hub-card">
+                <h2>[ APK/API FINDER ]</h2>
+                <p>Launch the targeted asset tracker. Scans the web environment directly for active mobile application packages.</p>
+            </a>
         </div>
-
-        <!-- PANEL 2: TEK FINDER Console -->
-        <div id="scannerPanel" class="view-panel">
-            <button class="back-btn" onclick="switchView('hub')">&lt;&lt; RETURN TO MAIN HUB</button>
-            <div class="search-wrapper">
-                <div class="input-group">
-                    <input type="text" id="userInput" placeholder="search://general-tech">
-                    <button onclick="searchTech('general')" class="execute-btn">[ SEARCH ]</button>
-                </div>
-            </div>
-            <h3>[ GENERAL ARCHITECTURE SCANNER ]</h3>
-            <div id="results" class="results-box">SYSTEM READY. AWAITING TARGET INPUT...</div>
-        </div>
-
-        <!-- PANEL 3: APK/API FINDER Console -->
-        <div id="binariesPanel" class="view-panel">
-            <button class="back-btn" onclick="switchView('hub')">&lt;&lt; RETURN TO MAIN HUB</button>
-            <div class="search-wrapper">
-                <div class="input-group">
-                    <input type="text" id="apkInput" placeholder="search://apk-or-api">
-                    <button onclick="searchTech('apk')" class="execute-btn">[ SCAN APK/API ]</button>
-                </div>
-            </div>
-            <h3>[ DEPLOYING TARGETED APK & BINARY LOCATOR ]</h3>
-            <div id="apkResults" class="results-box">SYSTEM READY. ENTER APPLICATION OR PACKAGE PAYLOAD KEYWORD...</div>
-        </div>
-
-        <button id="muteBtn" onclick="toggleMute()" class="mute-btn">[ SOUND: ON ]</button>
     </div>
-
     <script>
-        let isMuted = false;
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            const btn = document.getElementById('muteBtn');
-            if (isMuted) {
-                btn.innerText = "[ SOUND: OFF ]";
-                btn.style.color = "#ef4444"; 
-                btn.style.borderColor = "#ef4444";
-            } else {
-                btn.innerText = "[ SOUND: ON ]";
-                btn.style.color = "#00ff00"; 
-                btn.style.borderColor = "#00ff00";
-                playBeep(600, 'square', 100); 
-            }
-        }
-
-        function playBeep(freq, type, duration) {
-            if (isMuted) return; 
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.type = type; 
-                oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); 
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
-                setTimeout(() => { oscillator.stop(); audioCtx.close(); }, duration);
-            } catch(e) {}
-        }
-
-        function switchView(viewName) {
-            playBeep(500, 'sine', 80);
-            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
-            
-            if (viewName === 'hub') {
-                document.getElementById('hubPanel').classList.add('active');
-            } else if (viewName === 'scanner') {
-                document.getElementById('scannerPanel').classList.add('active');
-            } else if (viewName === 'binaries') {
-                document.getElementById('binariesPanel').classList.add('active');
-            }
-        }
-
-        // Smarter search function handling both general search and APK-specific filtering
-        function searchTech(mode) {
-            let query = "";
-            let resultsDiv = null;
-
-            if (mode === 'general') {
-                query = document.getElementById('userInput').value;
-                resultsDiv = document.getElementById('results');
-            } else {
-                // If it's the APK finder, automatically attach qualifiers to target repositories containing code assets or build configurations
-                const userText = document.getElementById('apkInput').value;
-                query = userText ? `${userText} apk OR api` : "";
-                resultsDiv = document.getElementById('apkResults');
-            }
-            
-            if(!query) {
-                playBeep(200, 'sawtooth', 300);
-                resultsDiv.innerHTML = "<span style='color: red;'>[-] ERROR: Input query is empty.</span>";
-                return;
-            }
-            
-            playBeep(400, 'square', 150);
-            resultsDiv.innerHTML = "<span style='color: #00ff00;'>[+] INITIATING PROTOCOL...</span><br><span>[+] Filtering for binary tags...</span><br><span>[+] Accessing Core Mainframe...</span>";
-
-            fetch('https://ai-tek-finder.onrender.com/search?query=' + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    playBeep(800, 'sine', 200);
-                    resultsDiv.innerHTML = data.results;
-                })
-                .catch(error => {
-                    playBeep(200, 'sawtooth', 400);
-                    resultsDiv.innerHTML = "<span style='color: red;'>[-] FATAL ERROR: Backend disconnected. Check terminal.</span>";
-                });
-        }
-
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
-        function setCanvasSize() { canvas.height = window.innerHeight; canvas.width = window.innerWidth; }
-        setCanvasSize();
-        window.addEventListener('resize', setCanvasSize);
-        
+        canvas.height = window.innerHeight; canvas.width = window.innerWidth;
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-        const fontSize = 16;
-        let columns = Math.floor(canvas.width / fontSize);
-        let drops = [];
-        for (let x = 0; x < columns; x++) { drops[x] = 1; }
-        
+        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
         function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff00'; 
-            ctx.font = 'bold ' + fontSize + 'px Courier New';
-            for (let i = 0; i < drops.length; i++) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
+            drops.forEach((y, i) => {
                 const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) { drops[i] = 0; }
+                ctx.fillText(text, i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
-            }
+            });
         }
         setInterval(draw, 35);
     </script>
