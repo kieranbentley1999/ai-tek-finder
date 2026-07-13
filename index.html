@@ -64,7 +64,6 @@
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         
-        /* Updated Grid for 3 Cards */
         .hub-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -102,39 +101,41 @@
             line-height: 1.4;
         }
 
-        /* MOBILE RESPONSIVE STYLES */
-        @media (max-width: 768px) {
+        /* HARD MOBILE OVERRIDE FIX */
+        @media (max-width: 900px) {
             body {
-                overflow-y: auto;
-                align-items: flex-start;
-                padding: 15px;
+                overflow-y: auto !important;
+                align-items: flex-start !important;
+                padding: 15px !important;
             }
             .terminal-container {
-                width: calc(100% - 30px); 
-                margin: 20px auto;
-                padding: 25px 15px;
+                width: calc(100% - 24px) !important; 
+                margin: 20px auto !important;
+                padding: 25px 15px !important;
             }
             h1 {
-                font-size: 1.4rem;
+                font-size: 1.3rem !important;
             }
             .subtitle {
-                font-size: 0.75rem;
-                margin-bottom: 20px;
+                font-size: 0.7rem !important;
+                margin-bottom: 25px !important;
             }
             .hub-grid {
-                grid-template-columns: 1fr; 
-                gap: 15px;
-                min-height: auto;
+                display: flex !important;
+                flex-direction: column !important; /* Absolute layout force stack */
+                gap: 15px !important;
+                min-height: auto !important;
             }
             .hub-card {
-                padding: 20px 15px;
+                padding: 18px 15px !important;
+                width: 100% !important;
             }
             .hub-card h2 {
-                font-size: 1.1rem;
-                margin-bottom: 8px;
+                font-size: 1.05rem !important;
+                margin-bottom: 6px !important;
             }
             .hub-card p {
-                font-size: 0.75rem;
+                font-size: 0.75rem !important;
             }
         }
     </style>
