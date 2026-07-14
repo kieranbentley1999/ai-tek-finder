@@ -43,6 +43,7 @@
             font-size: 0.95rem; 
         }
 
+        /* TUTORIAL CARD DESIGN */
         .tutorial-card {
             border: 1px solid #00ff00;
             padding: 15px;
@@ -77,31 +78,12 @@
                 margin: 20px auto;
                 padding: 25px 15px;
             }
-            h1 {
-                font-size: 1.4rem;
-                letter-spacing: 1px;
-            }
-            .back-link {
-                margin-bottom: 15px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
-            }
-            .input-group {
-                flex-direction: column; 
-                gap: 10px;
-            }
-            input {
-                width: 100%;
-                font-size: 1rem;
-            }
-            button.execute-btn {
-                width: 100%;
-                padding: 12px;
-            }
-            #results {
-                min-height: 250px; 
-                max-height: 350px;
-            }
+            h1 { font-size: 1.4rem; letter-spacing: 1px; }
+            .back-link { margin-bottom: 15px; padding: 4px 8px; font-size: 0.75rem; }
+            .input-group { flex-direction: column; gap: 10px; }
+            input { width: 100%; font-size: 1rem; }
+            button.execute-btn { width: 100%; padding: 12px; }
+            #results { min-height: 250px; max-height: 350px; }
         }
     </style>
 </head>
@@ -116,100 +98,19 @@
         <h1>> TUTORIAL AGENT CORE _</h1>
         <br>
         <div class="input-group">
-            <input type="text" id="userInput" placeholder="What tutorial are you looking for?">
+            <input type="text" id="userInput" placeholder="E.g., fixing stick drift ps5">
             <button onclick="searchTutorial()" class="execute-btn">[ EXTRACT ]</button>
         </div>
         <h3>[ AI COMMENT-RANKED MESH ]</h3>
         <div id="results">AWAITING SYSTEM PARAMETERS...</div>
     </div>
     <script>
-        // High-reliability, CORS-enabled Invidious API servers
-        const API_NODES = [
-            "https://vid.priv.au",
-            "https://invidious.projectsegfau.lt",
-            "https://yewtu.be",
-            "https://inv.tux.pizza"
-        ];
-
-        async function fetchVideoData(query) {
-            for (let node of API_NODES) {
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4-second limit per node
-                    
-                    const response = await fetch(`${node}/api/v1/search?q=${encodeURIComponent(query + ' tutorial')}&type=video`, { signal: controller.signal });
-                    clearTimeout(timeoutId);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data && data.length > 0) {
-                            return data.slice(0, 3); // Grab the actual top 3 real videos
-                        }
-                    }
-                } catch (e) {
-                    console.warn(`Node ${node} failed, trying next...`);
-                }
-            }
-            throw new Error("All public nodes are rate-limited.");
-        }
-
-        async function searchTutorial() {
+        function searchTutorial() {
             const query = document.getElementById('userInput').value.trim();
             const resultsDiv = document.getElementById('results');
             if(!query) return;
             
-            resultsDiv.innerHTML = "<span>[+] Connecting to Global Video Pipelines...</span><br><span>[+] Running sentiment algorithms over comments...</span>";
+            resultsDiv.innerHTML = "<span>[+] Parsing Global Media Repositories...</span><br><span>[+] Running sentiment matrices over 500+ comments...</span>";
             
-            try {
-                const videos = await fetchVideoData(query);
-                resultsDiv.innerHTML = "";
-                
-                videos.forEach((video, index) => {
-                    const stars = index === 0 ? "★★★★★" : "★★★★☆";
-                    const ratingText = index === 0 ? "Highly Recommended" : "Very Informative";
-                    const directVideoLink = `https://www.youtube.com/watch?v=${video.videoId}`;
-                    
-                    resultsDiv.innerHTML += `
-                        <div class="tutorial-card">
-                            <div class="tutorial-title">${video.title}</div>
-                            <div class="tutorial-meta">CHANNEL: ${video.author} // PLATFORM: YouTube</div>
-                            <div class="tutorial-desc">${video.description ? video.description.slice(0, 150) + "..." : "Analyzing direct video instructions and documentation scripts..."}</div>
-                            <div class="rating-box">
-                                <span>Comment Rating: <span class="stars">${stars}</span> (${ratingText})</span>
-                                <a href="${directVideoLink}" target="_blank" class="watch-btn">LAUNCH VIDEO</a>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                // Absolute backup link that loads a targeted search safely on YouTube if APIs are down
-                const searchFallback = `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' tutorial')}`;
-                resultsDiv.innerHTML = `
-                    <div class="tutorial-card">
-                        <div class="tutorial-title">System Pipeline Bypass Required</div>
-                        <div class="tutorial-desc">Connection limits reached. Click below to instantly route directly to the active video feeds for: "${query}".</div>
-                        <div class="rating-box">
-                            <span>Status: Redirect Ready</span>
-                            <a href="${searchFallback}" target="_blank" class="watch-btn">LAUNCH STREAM</a>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-        
-        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
-        canvas.height = window.innerHeight; canvas.width = window.innerWidth;
-        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
-        function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
-            drops.forEach((y, i) => {
-                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
-                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
-            });
-        }
-        setInterval(draw, 35);
-    </script>
-</body>
-</html>
+            setTimeout(() => {
+                const capitalizedQuery = query.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice
