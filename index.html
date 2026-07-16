@@ -27,6 +27,7 @@
             z-index: 1; 
         }
 
+        /* MASSIVE TOP BRAND HEADER */
         .master-brand-header {
             position: relative;
             z-index: 10;
@@ -64,7 +65,7 @@
             border: 1px solid #00ff00; 
             box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
             width: 95%;
-            max-width: 950px; /* Slightly wider layout to balance 4 cards */
+            max-width: 900px;
             padding: 35px 30px;
         }
         .corner {
@@ -98,11 +99,11 @@
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         
-        /* Balanced 4-Card Responsive Grid Layout */
+        /* 3-Card Grid */
         .hub-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
             margin-top: 10px;
             min-height: 220px;
             align-items: stretch;
@@ -110,7 +111,7 @@
         .hub-card {
             background: rgba(0, 20, 0, 0.3);
             border: 1px solid rgba(0, 255, 0, 0.4);
-            padding: 25px 12px;
+            padding: 25px 15px;
             text-align: center;
             text-decoration: none;
             color: #00ff00;
@@ -126,18 +127,18 @@
             transform: translateY(-2px);
         }
         .hub-card h2 {
-            font-size: 1.05rem;
+            font-size: 1.15rem;
             margin-bottom: 12px;
             letter-spacing: 1px;
         }
         .hub-card p {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #aaa;
             line-height: 1.4;
         }
 
         /* HARD MOBILE OVERRIDE FIX */
-        @media (max-width: 950px) {
+        @media (max-width: 900px) {
             body {
                 overflow-y: auto !important;
                 align-items: center !important;
@@ -206,22 +207,14 @@
         <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $TEKFIND</div>
         
         <div class="hub-grid">
-            <!-- Card 1: GitHub Platform -->
             <a href="tek.html" class="hub-card">
                 <h2>[ TEK FINDER ]</h2>
                 <p>Launch global queries to analyze open-source code and track repository health ratings.</p>
             </a>
-            <!-- Card 2: APK Platform -->
             <a href="apk.html" class="hub-card">
                 <h2>[ APK/API FINDER ]</h2>
                 <p>Track live application packages and check safety integrity ratings across the web.</p>
             </a>
-            <!-- Card 3: NEW Tutorial Agent -->
-            <a href="tutorials.html" class="hub-card">
-                <h2>[ TUTORIAL AGENT ]</h2>
-                <p>Index global documentation networks to extract active development tutorials instantly.</p>
-            </a>
-            <!-- Card 4: Project Documentation -->
             <a href="docs.html" class="hub-card">
                 <h2>[ SYSTEM DOCS ]</h2>
                 <p>Review the master blueprint, whitepaper, token utility mechanics, and the roadmap.</p>
