@@ -96,31 +96,40 @@ def search():
     # -------------------------------------------------------------
     else:
         gh_search_url = f"https://api.github.com/search/repositories?q={urllib.parse.quote(query)}&sort=stars&order=desc&per_page=3"
-        headers = {"Accept": "application/vnd.github.v3+json"}
         
-        # Check if GITHUB_TOKEN is added to Render
+        # Modern standard headers including a required User-Agent
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "TEKFINDER-Core-Agent/1.0"
+        }
+        
         github_token = os.environ.get('GITHUB_TOKEN')
         if github_token:
-            headers['Authorization'] = f"token {github_token}"
+            # Modernized REST authorization standard syntax
+            headers['Authorization'] = f"Bearer {github_token.strip()}"
         
         try:
             response = requests.get(gh_search_url, headers=headers, timeout=10)
             
-            # CRITICAL FIX: Safe check for non-JSON block pages
+            # Safe catch for non-JSON block pages (like Cloudflare raw HTML)
             try:
                 data = response.json()
             except ValueError:
                 return jsonify({
                     "results": (
-                        "<span style='color: #ff0000; font-weight: bold;'>[-] GITHUB API ACCESS BLOCKED</span><br><br>"
-                        "<span style='color: #aaa;'>Reason: GitHub rate-limited Render's shared IP address.</span><br>"
-                        "<span style='color: #aaa;'>Fix: Please add a <b>GITHUB_TOKEN</b> to your Render Environment Variables.</span>"
+                        f"<span style='color: #ff0000; font-weight: bold;'>[-] GITHUB API ACCESS BLOCKED</span><br><br>"
+                        f"<span style='color: #aaa;'>Reason: GitHub rejected the request or rate-limited the IP.</span><br>"
+                        f"<span style='color: #ffaa00;'>SYSTEM DIAGNOSTIC -> Token Loaded in Python: {bool(github_token)}</span><br><br>"
+                        f"<span style='color: #aaa;'>Action: If 'False', your variable isn't saved. If 'True', regenerate your ghp_ key.</span>"
                     )
                 })
             
+            if response.status_code != 200:
+                error_msg = data.get('message', f"HTTP Status {response.status_code}")
+                return jsonify({"results": f"<span style='color: yellow;'>[!] GITHUB API ERROR: {error_msg} (Token Active: {bool(github_token)})</span>"})
+                
             if 'items' not in data:
-                error_msg = data.get('message', 'GitHub rate limit exceeded.')
-                return jsonify({"results": f"<span style='color: yellow;'>[!] GITHUB API ERROR: {error_msg}</span>"})
+                return jsonify({"results": "<span style='color: yellow;'>[!] GITHUB FIREWALL: Unexpected API response structure.</span>"})
                 
             if len(data['items']) == 0:
                 return jsonify({"results": f"<span style='color: yellow;'>[!] NO TARGETS FOUND for '{query}'.</span>"})
