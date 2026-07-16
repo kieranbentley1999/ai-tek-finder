@@ -152,3 +152,20 @@ def search():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
+    @app.route('/trending', methods=['GET'])
+def get_trending():
+    # Route the trending list through Python using our secret token!
+    url = "https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=3"
+    headers = {
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "TEKFINDER-Core-Agent/1.0"
+    }
+    github_token = os.environ.get('GITHUB_TOKEN')
+    if github_token:
+        headers['Authorization'] = f"Bearer {github_token.strip()}"
+        
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        return jsonify(response.json())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

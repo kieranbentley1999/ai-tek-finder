@@ -13,10 +13,11 @@
             display: flex; justify-content: center; align-items: center;
         }
         #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        
         .terminal-container {
             position: relative; z-index: 10; 
             background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 700px; padding: 35px 30px;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 95%; max-width: 950px; padding: 35px 30px;
         }
         .corner {
             position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
@@ -25,52 +26,105 @@
         .c-tr { top: -9px; right: -6px; padding: 0 4px; }
         .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
         .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
+        
         h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
         .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
         .back-link:hover { background: #00ff00; color: #000; }
-        .input-group { display: flex; gap: 10px; width: 100%; margin-bottom: 15px;}
+        
+        /* DUAL COLUMN STRUCTURE */
+        .mainframe-columns {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* LEFT SIDE: TRENDING BOX */
+        .trending-box {
+            border: 1px dashed rgba(0, 255, 0, 0.5);
+            background-color: rgba(0, 10, 0, 0.6);
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+        .trending-box h3 {
+            font-size: 0.95rem;
+            color: #fff;
+            text-shadow: 0 0 5px #00ff00;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* RIGHT SIDE: SEARCH INTERFACE */
+        .search-interface {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 350px;
+        }
+        .input-group { display: flex; gap: 10px; width: 100%; }
         input { flex: 1; background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 12px 15px; font-size: 1.1rem; font-family: 'Courier New', Courier, monospace; outline: none; }
         button.execute-btn { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
         button.execute-btn:hover { background-color: #00ff00; color: #000; }
-        #results { border: 1px dashed rgba(0, 255, 0, 0.5); background-color: rgba(0, 0, 0, 0.6); padding: 20px; min-height: 150px; max-height: 200px; overflow-y: auto; font-size: 0.95rem; }
+        
+        #results { 
+            border: 1px dashed rgba(0, 255, 0, 0.5); 
+            background-color: rgba(0, 0, 0, 0.6); 
+            padding: 20px; 
+            flex-grow: 1;
+            overflow-y: auto; 
+            font-size: 0.95rem; 
+        }
+
+        /* CARD STYLINGS */
+        .trend-item {
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 8px 0;
+            text-align: left;
+        }
+        .trend-item:last-child { border-bottom: none; }
+        .trend-name { font-weight: bold; font-size: 0.9rem; }
+        .trend-name a { color: #00ff00; text-decoration: none; }
+        .trend-name a:hover { text-decoration: underline; }
+        .trend-desc { color: #888; font-size: 0.75rem; margin: 4px 0; line-height: 1.3; }
+        .trend-stats { font-size: 0.7rem; color: #00ff00; opacity: 0.8; }
+        .highlight-star { color: #ffff00; }
 
         /* MOBILE RESPONSIVE STYLES */
-        @media (max-width: 768px) {
+        @media (max-width: 850px) {
             body {
                 overflow-y: auto;
                 align-items: flex-start;
                 padding: 15px;
             }
             .terminal-container {
-                width: calc(100% - 30px);
-                margin: 20px auto;
-                padding: 25px 15px;
+                width: calc(100% - 10px);
+                margin: 15px auto;
+                padding: 20px 15px;
             }
-            h1 {
-                font-size: 1.4rem;
-                letter-spacing: 1px;
+            h1 { font-size: 1.3rem; letter-spacing: 1px; }
+            .back-link { margin-bottom: 15px; padding: 4px 8px; font-size: 0.75rem; }
+            
+            .mainframe-columns {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
             }
-            .back-link {
-                margin-bottom: 15px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
+            .trending-box {
+                height: 200px;
             }
-            .input-group {
-                flex-direction: column; 
-                gap: 10px;
-            }
-            input {
-                width: 100%;
-                font-size: 1rem;
-            }
-            button.execute-btn {
-                width: 100%;
-                padding: 12px;
+            .search-interface {
+                height: auto;
             }
             #results {
-                min-height: 220px; 
-                max-height: 320px;
+                min-height: 200px;
             }
+            .input-group { flex-direction: column; }
+            input, button.execute-btn { width: 100%; }
         }
     </style>
 </head>
@@ -83,23 +137,81 @@
         <span class="corner c-br">+</span>
         <a href="index.html" class="back-link"><< BACK TO HUB</a>
         <h1>> TEK FINDER CORE _</h1>
-        <br>
-        <div class="input-group">
-            <input type="text" id="userInput" placeholder="agent://prompt">
-            <button onclick="searchTech()" class="execute-btn">[ SEARCH ]</button>
+        
+        <div class="mainframe-columns">
+            <!-- LEFT COLUMN: DYNAMIC TRENDING REPOS -->
+            <div class="trending-box">
+                <h3>[ LIVE TRENDING ]</h3>
+                <div id="trending-list"><span>[+] Initializing live node sync...</span></div>
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE INTERACTION & SEARCH -->
+            <div class="search-interface">
+                <div class="input-group">
+                    <input type="text" id="userInput" placeholder="agent://prompt">
+                    <button onclick="searchTech()" class="execute-btn">[ SEARCH ]</button>
+                </div>
+                <div id="results">AWAITING SCAN COMMAND PARAMETERS...</div>
+            </div>
         </div>
-        <h3>[ TERMINAL OUTPUT ]</h3>
-        <div id="results">SYSTEM READY. AWAITING INPUT...</div>
     </div>
+    
     <script>
-        function searchTech() {
-            const query = document.getElementById('userInput').value;
+        // Real-Time GitHub Popularity Tracker
+        async function loadTrendingRepos() {
+            const trendingList = document.getElementById('trending-list');
+            try {
+                const response = await fetch("https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=3");
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                
+                trendingList.innerHTML = "";
+                data.items.forEach((repo) => {
+                    trendingList.innerHTML += `
+                        <div class="trend-item">
+                            <div class="trend-name">> <a href="${repo.html_url}" target="_blank">${repo.name}</a></div>
+                            <div class="trend-desc">${repo.description ? repo.description.slice(0, 95) + "..." : "No description metadata available."}</div>
+                            <div class="trend-stats">
+                                <span class="highlight-star">★</span> ${repo.stargazers_count.toLocaleString()} | 🧬 ${repo.language || "Mixed"}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                trendingList.innerHTML = "<span>[!] Node congestion. Unable to pull global live data.</span>";
+            }
+        }
+
+        window.onload = loadTrendingRepos;
+
+        // Smooth search query function with bulletproof timeout handling
+        async function searchTech() {
+            const query = document.getElementById('userInput').value.trim();
             const resultsDiv = document.getElementById('results');
             if(!query) return;
-            resultsDiv.innerHTML = "<span>[+] Accessing GitHub Mainframe...</span>";
-            fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query)}`)
-                .then(r => r.json()).then(d => { resultsDiv.innerHTML = d.results; });
+
+            resultsDiv.innerHTML = "<span>[+] Establishing encrypted handshake...</span><br><span>[+] Wake signal sent to remote core...</span>";
+            
+            try {
+                const response = await fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error("SERVER_DISCONNECTED");
+                }
+                
+                const data = await response.json();
+                resultsDiv.innerHTML = data.results || "<span>[!] Empty payload received from remote node.</span>";
+            } catch (err) {
+                resultsDiv.innerHTML = `
+                    <div style="color: #ff0000; border: 1px dashed #ff0000; padding: 15px; background: rgba(30, 0, 0, 0.6); font-size: 0.85rem; line-height: 1.5;">
+                        <span style="font-weight: bold;">[-] REMOTE ACCESS TIMEOUT DETECTED</span><br><br>
+                        <span style="color: #aaa;">Reason: Render backend container is currently waking up from standby.</span><br>
+                        <span style="color: #aaa;">Action: Please wait 30 seconds and click [ SEARCH ] again.</span>
+                    </div>
+                `;
+            }
         }
+
         const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
