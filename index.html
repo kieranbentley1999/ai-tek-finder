@@ -3,282 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS TEKFINDER Hub | $TEKFIND</title>
+    <title>TEKFINDER Platform</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background-color: #000; 
-            color: #00ff00;
+            background-color: #000; color: #00ff00;
             font-family: 'Courier New', Courier, monospace;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            overflow: hidden; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
         }
-        #matrixCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 1; 
-        }
-
-        /* MASSIVE TOP BRAND HEADER */
-        .master-brand-header {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-        }
-        .master-brand-logo {
-            width: 110px;
-            height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 15px rgba(0, 255, 0, 0.8));
-        }
-        .master-brand-title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            letter-spacing: 12px;
-            text-transform: uppercase;
-            color: #00ff00;
-            text-shadow: 0 0 20px rgba(0, 255, 0, 0.7), 0 0 40px rgba(0, 255, 0, 0.4);
-            animation: pulse-glow 3s infinite alternate;
-        }
-        @keyframes pulse-glow {
-            from { text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); }
-            to { text-shadow: 0 0 25px rgba(0, 255, 0, 0.9), 0 0 50px rgba(0, 255, 0, 0.5); }
-        }
-
-        /* PREMIUM TOKEN CONTRACT ADDRESS STYLE */
-        .token-ca-box {
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #00ff00;
-            border: 1px dashed rgba(0, 255, 0, 0.5);
-            padding: 8px 16px;
-            background: rgba(0, 20, 0, 0.7);
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            letter-spacing: 1px;
-            max-width: 90%;
-            word-break: break-all;
-            text-align: center;
-        }
-        .token-ca-box:hover {
-            background: rgba(0, 255, 0, 0.15);
-            border-color: #00ff00;
-            box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
-        }
-        .ca-label {
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 5px #00ff00;
-        }
-
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        
         .terminal-container {
-            position: relative;
-            z-index: 10; 
-            background-color: rgba(0, 0, 0, 0.85);
-            border: 1px solid #00ff00; 
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
-            width: 95%;
-            max-width: 900px;
-            padding: 35px 30px;
+            position: relative; z-index: 10; 
+            background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 95%; max-width: 950px; padding: 35px 30px;
         }
         .corner {
-            position: absolute;
-            color: #00ff00;
-            font-size: 1.2rem;
-            line-height: 1;
-            background: #000;
+            position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
         }
         .c-tl { top: -9px; left: -6px; padding: 0 4px; }
         .c-tr { top: -9px; right: -6px; padding: 0 4px; }
         .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
         .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
         
-        h1 { 
-            font-size: 1.8rem; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            letter-spacing: 2px; 
-            text-shadow: 0 0 8px #00ff00;
-            text-align: center;
-        }
-        .subtitle {
-            color: #00ff00;
-            opacity: 0.7;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .cursor { animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
+        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
+        .back-link:hover { background: #00ff00; color: #000; }
         
-        /* 3-Card Grid */
-        .hub-grid {
+        /* DUAL COLUMN STRUCTURE */
+        .mainframe-columns {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 320px 1fr; /* Left column 320px, right column fills the rest */
             gap: 20px;
             margin-top: 10px;
-            min-height: 220px;
-            align-items: stretch;
-        }
-        .hub-card {
-            background: rgba(0, 20, 0, 0.3);
-            border: 1px solid rgba(0, 255, 0, 0.4);
-            padding: 25px 15px;
-            text-align: center;
-            text-decoration: none;
-            color: #00ff00;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        .hub-card:hover {
-            background: rgba(0, 255, 0, 0.1);
-            border-color: #00ff00;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
-            transform: translateY(-2px);
-        }
-        .hub-card h2 {
-            font-size: 1.15rem;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-        }
-        .hub-card p {
-            font-size: 0.8rem;
-            color: #aaa;
-            line-height: 1.4;
         }
 
-        /* HARD MOBILE OVERRIDE FIX */
-        @media (max-width: 900px) {
+        /* LEFT SIDE: TRENDING BOX */
+        .trending-box {
+            border: 1px dashed rgba(0, 255, 0, 0.5);
+            background-color: rgba(0, 10, 0, 0.6);
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+        .trending-box h3 {
+            font-size: 0.95rem;
+            color: #fff;
+            text-shadow: 0 0 5px #00ff00;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* RIGHT SIDE: SEARCH INTERFACE */
+        .search-interface {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            height: 350px;
+        }
+        .input-group { display: flex; gap: 10px; width: 100%; }
+        input { flex: 1; background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 12px 15px; font-size: 1.1rem; font-family: 'Courier New', Courier, monospace; outline: none; }
+        button.execute-btn { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        button.execute-btn:hover { background-color: #00ff00; color: #000; }
+        
+        #results { 
+            border: 1px dashed rgba(0, 255, 0, 0.5); 
+            background-color: rgba(0, 0, 0, 0.6); 
+            padding: 20px; 
+            flex-grow: 1; /* Make results take up the remaining search space */
+            overflow-y: auto; 
+            font-size: 0.95rem; 
+        }
+
+        /* CARD STYLINGS */
+        .trend-item {
+            border-bottom: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 8px 0;
+            text-align: left;
+        }
+        .trend-item:last-child { border-bottom: none; }
+        .trend-name { font-weight: bold; font-size: 0.9rem; }
+        .trend-name a { color: #00ff00; text-decoration: none; }
+        .trend-name a:hover { text-decoration: underline; }
+        .trend-desc { color: #888; font-size: 0.75rem; margin: 4px 0; line-height: 1.3; }
+        .trend-stats { font-size: 0.7rem; color: #00ff00; opacity: 0.8; }
+        .highlight-star { color: #ffff00; }
+
+        /* MOBILE RESPONSIVE STYLES */
+        @media (max-width: 850px) {
             body {
-                overflow-y: auto !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                padding: 15px !important;
-            }
-            .master-brand-header {
-                margin-top: 20px !important;
-                margin-bottom: 15px !important;
-            }
-            .master-brand-logo {
-                width: 70px !important;
-                margin-bottom: 10px !important;
-            }
-            .master-brand-title {
-                font-size: 2.2rem !important;
-                letter-spacing: 6px !important;
-            }
-            .token-ca-box {
-                font-size: 0.7rem !important;
-                padding: 6px 12px !important;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 15px;
             }
             .terminal-container {
-                width: calc(100% - 24px) !important; 
-                margin: 0 auto 30px auto !important;
-                padding: 25px 15px !important;
+                width: calc(100% - 10px);
+                margin: 15px auto;
+                padding: 20px 15px;
             }
-            h1 {
-                font-size: 1.3rem !important;
+            h1 { font-size: 1.3rem; letter-spacing: 1px; }
+            .back-link { margin-bottom: 15px; padding: 4px 8px; font-size: 0.75rem; }
+            
+            /* STACK THE COLUMNS VERTICALLY ON MOBILE */
+            .mainframe-columns {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
             }
-            .subtitle {
-                font-size: 0.7rem !important;
-                margin-bottom: 25px !important;
+            .trending-box {
+                height: 200px;
             }
-            .hub-grid {
-                display: flex !important;
-                flex-direction: column !important; 
-                gap: 15px !important;
-                min-height: auto !important;
+            .search-interface {
+                height: auto;
             }
-            .hub-card {
-                padding: 18px 15px !important;
-                width: 100% !important;
+            #results {
+                min-height: 200px;
             }
-            .hub-card h2 {
-                font-size: 1.05rem !important;
-                margin-bottom: 6px !important;
-            }
-            .hub-card p {
-                font-size: 0.75rem !important;
-            }
+            .input-group { flex-direction: column; }
+            input, button.execute-btn { width: 100%; }
         }
     </style>
 </head>
 <body>
     <canvas id="matrixCanvas"></canvas>
-
-    <div class="master-brand-header">
-        <img src="logo.png" alt="NEXUS LOGO" class="master-brand-logo" onerror="this.style.display='none';">
-        <div class="master-brand-title">NEXUS</div>
-        <!-- INTERACTIVE CONTRACT ADDRESS CONTAINER -->
-        <div class="token-ca-box" onclick="copyContractAddress(this)">
-            <span class="ca-label">CA:</span> <span id="ca-string">2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump</span>
-        </div>
-    </div>
-
     <div class="terminal-container">
         <span class="corner c-tl">+</span>
         <span class="corner c-tr">+</span>
         <span class="corner c-bl">+</span>
         <span class="corner c-br">+</span>
-
-        <h1>> MAINFRAME ACTIVE <span class="cursor">_</span></h1>
-        <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $TEKFIND</div>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
+        <h1>> TEK FINDER CORE _</h1>
         
-        <div class="hub-grid">
-            <!-- Card 1: GitHub Platform -->
-            <a href="tek.html" class="hub-card">
-                <h2>[ TEK FINDER ]</h2>
-                <p>Launch global queries to analyze open-source code and track repository health ratings.</p>
-            </a>
-            <!-- Card 2: APK Platform -->
-            <a href="apk.html" class="hub-card">
-                <h2>[ APK/API FINDER ]</h2>
-                <p>Track live application packages and check safety integrity ratings across the web.</p>
-            </a>
-            <!-- Card 3: Project Documentation -->
-            <a href="docs.html" class="hub-card">
-                <h2>[ SYSTEM DOCS ]</h2>
-                <p>Review the master blueprint, whitepaper, token utility mechanics, and the roadmap.</p>
-            </a>
+        <div class="mainframe-columns">
+            <!-- LEFT COLUMN: DYNAMIC TRENDING REPOS -->
+            <div class="trending-box">
+                <h3>[ LIVE TRENDING ]</h3>
+                <div id="trending-list"><span>[+] Initializing live node sync...</span></div>
+            </div>
+
+            <!-- RIGHT COLUMN: LIVE INTERACTION & SEARCH -->
+            <div class="search-interface">
+                <div class="input-group">
+                    <input type="text" id="userInput" placeholder="agent://prompt">
+                    <button onclick="searchTech()" class="execute-btn">[ SEARCH ]</button>
+                </div>
+                <div id="results">AWAITING SCAN COMMAND PARAMETERS...</div>
+            </div>
         </div>
     </div>
+    
     <script>
-        // Copy Token Address to Clipboard
-        function copyContractAddress(containerElement) {
-            const caAddress = "2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump";
-            navigator.clipboard.writeText(caAddress).then(() => {
-                const caTextSpan = document.getElementById("ca-string");
-                const originalText = caTextSpan.innerText;
+        // Real-Time GitHub Popularity Tracker
+        async function loadTrendingRepos() {
+            const trendingList = document.getElementById('trending-list');
+            try {
+                // Fetch top 3 starred GitHub repos dynamically
+                const response = await fetch("https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=3");
+                if (!response.ok) throw new Error();
+                const data = await response.json();
                 
-                caTextSpan.innerText = "ADDRESS COPIED TO CLIPBOARD!";
-                caTextSpan.style.color = "#ffffff";
-                
-                setTimeout(() => {
-                    caTextSpan.innerText = originalText;
-                    caTextSpan.style.color = "#00ff00";
-                }, 1500);
-            });
+                trendingList.innerHTML = "";
+                data.items.forEach((repo) => {
+                    trendingList.innerHTML += `
+                        <div class="trend-item">
+                            <div class="trend-name">> <a href="${repo.html_url}" target="_blank">${repo.name}</a></div>
+                            <div class="trend-desc">${repo.description ? repo.description.slice(0, 95) + "..." : "No description metadata available."}</div>
+                            <div class="trend-stats">
+                                <span class="highlight-star">★</span> ${repo.stargazers_count.toLocaleString()} | 🧬 ${repo.language || "Mixed"}
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                trendingList.innerHTML = "<span>[!] Node congestion. Unable to pull global live data.</span>";
+            }
         }
 
-        const canvas = document.getElementById('matrixCanvas');
-        const ctx = canvas.getContext('2d');
+        // Initialize trending list on startup
+        window.onload = loadTrendingRepos;
+
+        function searchTech() {
+            const query = document.getElementById('userInput').value;
+            const resultsDiv = document.getElementById('results');
+            if(!query) return;
+
+            resultsDiv.innerHTML = "<span>[+] Accessing GitHub Mainframe...</span>";
+            fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query)}`)
+                .then(r => r.json()).then(d => { resultsDiv.innerHTML = d.results; });
+        }
+
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
         let drops = Array(Math.floor(canvas.width / 16)).fill(1);
@@ -286,10 +205,8 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
             drops.forEach((y, i) => {
-                const text = letters[Math.floor(Math.random() * letters.length)];
-                ctx.fillText(text, i * 16, y * 16);
-                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
             });
         }
         setInterval(draw, 35);
