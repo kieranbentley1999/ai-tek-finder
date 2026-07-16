@@ -35,8 +35,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: center;
+            width: 100%;
         }
         .master-brand-logo {
             width: 110px;
@@ -56,6 +57,32 @@
         @keyframes pulse-glow {
             from { text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); }
             to { text-shadow: 0 0 25px rgba(0, 255, 0, 0.9), 0 0 50px rgba(0, 255, 0, 0.5); }
+        }
+
+        /* PREMIUM TOKEN CONTRACT ADDRESS STYLE */
+        .token-ca-box {
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: #00ff00;
+            border: 1px dashed rgba(0, 255, 0, 0.5);
+            padding: 8px 16px;
+            background: rgba(0, 20, 0, 0.7);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            letter-spacing: 1px;
+            max-width: 90%;
+            word-break: break-all;
+            text-align: center;
+        }
+        .token-ca-box:hover {
+            background: rgba(0, 255, 0, 0.15);
+            border-color: #00ff00;
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.3);
+        }
+        .ca-label {
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px #00ff00;
         }
 
         .terminal-container {
@@ -157,6 +184,10 @@
                 font-size: 2.2rem !important;
                 letter-spacing: 6px !important;
             }
+            .token-ca-box {
+                font-size: 0.7rem !important;
+                padding: 6px 12px !important;
+            }
             .terminal-container {
                 width: calc(100% - 24px) !important; 
                 margin: 0 auto 30px auto !important;
@@ -195,6 +226,10 @@
     <div class="master-brand-header">
         <img src="logo.png" alt="NEXUS LOGO" class="master-brand-logo" onerror="this.style.display='none';">
         <div class="master-brand-title">NEXUS</div>
+        <!-- INTERACTIVE CONTRACT ADDRESS CONTAINER -->
+        <div class="token-ca-box" onclick="copyContractAddress(this)">
+            <span class="ca-label">CA:</span> <span id="ca-string">2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump</span>
+        </div>
     </div>
 
     <div class="terminal-container">
@@ -207,14 +242,17 @@
         <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $TEKFIND</div>
         
         <div class="hub-grid">
+            <!-- Card 1: GitHub Platform -->
             <a href="tek.html" class="hub-card">
                 <h2>[ TEK FINDER ]</h2>
                 <p>Launch global queries to analyze open-source code and track repository health ratings.</p>
             </a>
+            <!-- Card 2: APK Platform -->
             <a href="apk.html" class="hub-card">
                 <h2>[ APK/API FINDER ]</h2>
                 <p>Track live application packages and check safety integrity ratings across the web.</p>
             </a>
+            <!-- Card 3: Project Documentation -->
             <a href="docs.html" class="hub-card">
                 <h2>[ SYSTEM DOCS ]</h2>
                 <p>Review the master blueprint, whitepaper, token utility mechanics, and the roadmap.</p>
@@ -222,6 +260,23 @@
         </div>
     </div>
     <script>
+        // Copy Token Address to Clipboard
+        function copyContractAddress(containerElement) {
+            const caAddress = "2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump";
+            navigator.clipboard.writeText(caAddress).then(() => {
+                const caTextSpan = document.getElementById("ca-string");
+                const originalText = caTextSpan.innerText;
+                
+                caTextSpan.innerText = "ADDRESS COPIED TO CLIPBOARD!";
+                caTextSpan.style.color = "#ffffff";
+                
+                setTimeout(() => {
+                    caTextSpan.innerText = originalText;
+                    caTextSpan.style.color = "#00ff00";
+                }, 1500);
+            });
+        }
+
         const canvas = document.getElementById('matrixCanvas');
         const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
