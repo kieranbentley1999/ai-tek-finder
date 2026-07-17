@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal File Transformer</title>
+    
+    <!-- ENGINE 1: Tesseract OCR for text extraction -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <!-- ENGINE 2: Heic-To for native HEIC/HEIF decoding in browser -->
+    <script src="https://cdn.jsdelivr.net/npm/heic-to@1.5.2/dist/iife/heic-to.js"></script>
+    
+    <!-- ENGINE 3: jsPDF for converting files/images to PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000; color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+        }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        
+        .terminal-container {
+            position: relative; z-index: 10; 
+            background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 800px; padding: 35px 30px;
+        }
+        .corner {
+            position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
+        }
+        .c-tl { top: -9px; left: -6px; padding: 0 4px; }
+        .c-tr { top: -9px; right: -6px; padding: 0 4px; }
+        .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
+        .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
+        
+        h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
+        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
+        .back-link:hover { background: #00ff00; color: #000; }
+
+        /* Drag & Drop Zone */
+        .drop-zone {
+            border: 2px dashed #00ff00;
+            padding: 30px;
+            text-align: center;
+            background: rgba(0, 20, 0, 0.4);
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            background: rgba(0, 255, 0, 0.15);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
+        }
+        .drop-zone input { display: none; }
+
+        /* Controls Panel */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        select, button.action-btn {
+            background: transparent;
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+        }
+        select option { background: #000; color: #00ff00; }
+        button.action-btn:hover { background: #00ff00; color: #000; }
+
+        #console-output {
+            border: 1px dashed rgba(0, 255, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+    <div class="terminal-container">
+        <span class="corner c-tl">+</span>
+        <span class="corner c-tr">+</span>
+        <span class="corner c-bl">+</span>
+        <span class="corner c-br">+</span>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
+        <h1>> UNIVERSAL FILE TRANSFORMER _</h1>
+        <br>
+
+        <!-- DRAG AND DROP ZONE -->
+        <div class="drop-zone" id="dropZone">
+            <p id="dropText">[ DRAG & DROP FILE HERE OR CLICK TO UPLOAD ]</p>
+            <p style="font-size: 0.75rem; color: #888; margin-top: 5px;">Supports: PNG, JPG, WEBP, HEIC/HEIF | Images/Docs to PDF | OCR Text Scan</p>
+            <input type="file" id="fileInput">
+        </div>
+
+        <!-- CONTROLS -->
+        <div class="controls">
+            <label for="formatSelect">TARGET FORMAT:</label>
+            <select id="formatSelect">
+                <option value="png">PNG (Image)</option>
+                <option value="jpeg">JPEG (Image)</option>
+                <option value="webp">WEBP (Compressed Image)</option>
+                <option value="pdf">PDF (Document Comp)</option>
+                <option value="txt">TEXT EXTRACT (OCR)</option>
+            </select>
+            <button onclick="processFile()" class="action-btn">[ RUN TRANSFORMATION ]</button>
+        </div>
+
+        <h3>[ MAINFRAME OPERATIONS LOG ]</h3>
+        <div id="console-output">SYSTEM READY. AWAITING INPUT PAYLOAD...</div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const dropText = document.getElementById('dropText');
+        const consoleOutput = document.getElementById('console-output');
+        let activeFile = null;
+
+        // Trigger input file dialog on click
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // File Drag & Drop Events
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelection(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelection(file) {
+            activeFile = file;
+            dropText.innerHTML = `[ SELECTED: ${file.name.toUpperCase()} ]`;
+            writeLog(`[+] Loaded payload: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+        }
+
+        function writeLog(text) {
+            consoleOutput.innerHTML += `\n${text}`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Helper to convert images (including HEIC) to local DataURL
+        async function getFileAsImageSrc(file) {
+            const fileName = file.name.toLowerCase();
+            
+            // Check if Apple HEIC file signature
+            if (fileName.endsWith('.heic') || fileName.endsWith('.heif')) {
+                writeLog("[+] DETECTION: HEIC format. Activating WebAssembly decoding sequence...");
+                await sleep(400);
+                
+                try {
+                    // Using the IIFE build of heic-to to convert client-side
+                    const convertedBlob = await HeicTo({ blob: file, type: "image/png" });
+                    return new Promise((resolve) => {
+                        const r = new FileReader();
+                        r.onload = () => resolve(r.result);
+                        r.readAsDataURL(convertedBlob);
+                    });
+                } catch (err) {
+                    writeLog(`[-] HEIC CORE FAILURE: ${err.message}`);
+                    throw err;
+                }
+            }
+
+            // Default image reading path
+            return new Promise((resolve) => {
+                const r = new FileReader();
+                r.onload = () => resolve(r.result);
+                r.readAsDataURL(file);
+            });
+        }
+
+        // Main process trigger
+        async function processFile() {
+            if (!activeFile) {
+                writeLog("[-] ERROR: No active payload loaded in system buffer.");
+                return;
+            }
+
+            const targetFormat = document.getElementById('formatSelect').value;
+            consoleOutput.innerHTML = ""; // Clear log
+            writeLog("[+] INITIALIZING LOCAL TRANSFORMER ENGINE...");
+            await sleep(400);
+            writeLog("[+] ALLOCATING SANDBOX MEMORY CHANNELS...");
+            await sleep(300);
+
+            try {
+                // Get valid image representation
+                const imageSrc = await getFileAsImageSrc(activeFile);
+
+                // PATH 1: Text Extraction (OCR)
+                if (targetFormat === "txt") {
+                    writeLog("[+] SPINNING UP TESSERACT OCR COGNITIVE PARSER...");
+                    await sleep(300);
+                    writeLog("[+] PARSING IMAGE TEXT CHARACTERS...");
+
+                    const result = await Tesseract.recognize(imageSrc, 'eng');
+                    writeLog("\n================ EXTRACTED TEXT ================\n");
+                    writeLog(result.data.text || "[!] No readable text segments mapped in canvas.");
+                    writeLog("\n=================================================");
+                } 
+                // PATH 2: Document compilation (PDF format)
+                else if (targetFormat === "pdf") {
+                    writeLog("[+] ASSEMBLING TARGET PDF CONTAINERS...");
+                    await sleep(300);
+
+                    const img = new Image();
+                    img.onload = function() {
+                        const { jsPDF } = window.jspdf;
+                        // Match PDF orientation with image aspect ratio
+                        const orientation = img.width > img.height ? 'l' : 'p';
+                        const pdf = new jsPDF({
+                            orientation: orientation,
+                            unit: 'px',
+                            format: [img.width, img.height]
+                        });
+
+                        pdf.addImage(imageSrc, 'PNG', 0, 0, img.width, img.height);
+                        
+                        const originalName = activeFile.name.substring(0, activeFile.name.lastIndexOf('.')) || activeFile.name;
+                        pdf.save(`${originalName}.pdf`);
+
+                        writeLog("[+] ENCODING COMPLETED.");
+                        writeLog(`[+] FILE "${originalName}.pdf" COMPILED AND DOWNLOADED.`);
+                    };
+                    img.src = imageSrc;
+                }
+                // PATH 3: Standard Image Formatting (PNG, JPEG, WEBP)
+                else {
+                    writeLog(`[+] CONVERTING MATRIX TO ${targetFormat.toUpperCase()} DATASTREAM...`);
+                    await sleep(300);
+
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        const mimeType = `image/${targetFormat === 'jpeg' ? 'jpeg' : targetFormat}`;
+                        const dataUrl = canvas.toDataURL(mimeType);
+
+                        const downloadLink = document.createElement('a');
+                        const originalName = activeFile.name.substring(0, activeFile.name.lastIndexOf('.')) || activeFile.name;
+                        downloadLink.download = `${originalName}.${targetFormat}`;
+                        downloadLink.href = dataUrl;
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+
+                        writeLog("[+] FILE CONVERTED LOCALLY.");
+                        writeLog(`[+] FILE "${originalName}.${targetFormat}" SECURELY DOWNLOADED.`);
+                    };
+                    img.src = imageSrc;
+                }
+            } catch (err) {
+                writeLog(`[-] TRANSFORM INTERRUPT EXCEPTION: ${err.message}`);
+            }
+        }
+
+        // Standard Matrix Falling Characters Animation
+        const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
+        canvas.height = window.innerHeight; canvas.width = window.innerWidth;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+        let drops = Array(Math.floor(canvas.width / 16)).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff00'; ctx.font = 'bold 16px Courier New';
+            drops.forEach((y, i) => {
+                ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+            });
+        }
+        setInterval(draw, 35);
+    </script>
+</body>
+</html>
