@@ -16,7 +16,7 @@
         .terminal-container {
             position: relative; z-index: 10; 
             background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 700px; padding: 35px 30px;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 750px; padding: 35px 30px;
         }
         .corner {
             position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
@@ -28,11 +28,45 @@
         h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
         .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
         .back-link:hover { background: #00ff00; color: #000; }
+        
         .input-group { display: flex; gap: 10px; width: 100%; margin-bottom: 15px;}
         input { flex: 1; background-color: transparent; border: 1px solid #00ff00; color: #00ff00; padding: 12px 15px; font-size: 1.1rem; font-family: 'Courier New', Courier, monospace; outline: none; }
-        button.execute-btn { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 12px 25px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        
+        /* Dual Button Actions */
+        button.execute-btn { background-color: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 12px 20px; font-size: 1rem; font-weight: bold; cursor: pointer; font-family: 'Courier New', monospace; }
         button.execute-btn:hover { background-color: #00ff00; color: #000; }
-        #results { border: 1px dashed rgba(0, 255, 0, 0.5); background-color: rgba(0, 0, 0, 0.6); padding: 20px; min-height: 150px; max-height: 200px; overflow-y: auto; font-size: 0.95rem; }
+        button.api-btn { color: #00ffcc; border-color: #00ffcc; }
+        button.api-btn:hover { background-color: #00ffcc; color: #000; }
+
+        #results { border: 1px dashed rgba(0, 255, 0, 0.5); background-color: rgba(0, 0, 0, 0.6); padding: 20px; min-height: 180px; max-height: 250px; overflow-y: auto; font-size: 0.95rem; }
+
+        /* Dynamic Terminal Elements */
+        .terminal-btn {
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            margin: 8px 0;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .terminal-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .code-box {
+            background-color: rgba(0, 20, 0, 0.8);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
 
         /* MOBILE RESPONSIVE STYLES */
         @media (max-width: 768px) {
@@ -42,35 +76,16 @@
                 padding: 15px;
             }
             .terminal-container {
-                width: calc(100% - 30px);
-                margin: 20px auto;
+                width: calc(100% - 10px);
+                margin: 15px auto;
                 padding: 25px 15px;
             }
-            h1 {
-                font-size: 1.4rem;
-                letter-spacing: 1px;
-            }
-            .back-link {
-                margin-bottom: 15px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
-            }
-            .input-group {
-                flex-direction: column; 
-                gap: 10px;
-            }
-            input {
-                width: 100%;
-                font-size: 1rem;
-            }
-            button.execute-btn {
-                width: 100%;
-                padding: 12px;
-            }
-            #results {
-                min-height: 220px; 
-                max-height: 320px;
-            }
+            h1 { font-size: 1.4rem; letter-spacing: 1px; }
+            .back-link { margin-bottom: 15px; padding: 4px 8px; font-size: 0.75rem; }
+            .input-group { flex-direction: column; gap: 10px; }
+            input { width: 100%; font-size: 1rem; }
+            button.execute-btn { width: 100%; padding: 12px; }
+            #results { min-height: 250px; max-height: 350px; }
         }
     </style>
 </head>
@@ -85,21 +100,104 @@
         <h1>> APK / API FINDER _</h1>
         <br>
         <div class="input-group">
-            <input type="text" id="userInput" placeholder="Enter application name...">
-            <button onclick="searchApk()" class="execute-btn">[ SCAN NET ]</button>
+            <input type="text" id="userInput" placeholder="Query (e.g., spotify, weather)...">
+            <button onclick="runDiagnosticScan('apk')" class="execute-btn">[ SCAN APK ]</button>
+            <button onclick="runDiagnosticScan('api')" class="execute-btn api-btn">[ FIND API ]</button>
         </div>
-        <h3>[ SAFETY SCANNER OUTPUT ]</h3>
-        <div id="results">READY TO SCAN DEPLOYMENTS...</div>
+        <h3>[ SCANNED OUTPUT FEED ]</h3>
+        <div id="results">READY TO SCAN NETWORK DEPLOYMENTS...</div>
     </div>
+
     <script>
-        function searchApk() {
-            const query = document.getElementById('userInput').value;
+        // Toggle visibility of code template blocks
+        function toggleCode(elementId, snippet) {
+            const codeBox = document.getElementById(elementId);
+            if (codeBox.style.display === "none") {
+                codeBox.innerHTML = snippet;
+                codeBox.style.display = "block";
+            } else {
+                codeBox.style.display = "none";
+            }
+        }
+
+        // Diagnostic Delay helper
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Unified Live Diagnostic scan for APKs and APIs
+        async function runDiagnosticScan(type) {
+            const query = document.getElementById('userInput').value.trim();
             const resultsDiv = document.getElementById('results');
             if(!query) return;
-            resultsDiv.innerHTML = "<span>[+] Accessing Global Intelligence Mesh...</span>";
-            fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query + ' apk')}`)
-                .then(r => r.json()).then(d => { resultsDiv.innerHTML = d.results; });
+
+            // Neon color theme toggle
+            const isApi = type === 'api';
+            const accentColor = isApi ? '#00ffcc' : '#00ff00';
+
+            // Multi-step diagnostic logging
+            const steps = [
+                `<span>[+] INITIALIZING CORE PROXY ROUTING [TARGET: ${type.toUpperCase()}]...</span>`,
+                `<span>[+] OVERPASSING CORS SECURITY POLICIES VIA RE-ROUTE INSTANCE...</span>`,
+                `<span>[+] SEARCHING MASSIVE LIVE DATA REPOSITORIES FOR '${query.toUpperCase()}'...</span>`,
+                `<span>[+] PARSING PACKAGES AND EXTRACTING SECURE ENDPOINTS...</span>`
+            ];
+
+            resultsDiv.innerHTML = "";
+            for (let i = 0; i < steps.length; i++) {
+                resultsDiv.innerHTML += `<span style="color: ${accentColor};">${steps[i]}</span><br>`;
+                resultsDiv.scrollTop = resultsDiv.scrollHeight;
+                await sleep(350);
+            }
+
+            try {
+                if (type === 'apk') {
+                    // APK Search Query
+                    const response = await fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query + ' apk')}`);
+                    if (!response.ok) throw new Error();
+                    const d = await response.json();
+                    resultsDiv.innerHTML = d.results || "<span>[!] Remote APK return payload empty.</span>";
+                } else {
+                    // Public API Directory Query
+                    const response = await fetch(`https://ai-tek-finder.onrender.com/find-apis?query=${encodeURIComponent(query)}`);
+                    if (!response.ok) throw new Error();
+                    const data = await response.json();
+                    
+                    if (!data.apis || data.apis.length === 0) {
+                        resultsDiv.innerHTML = `<span style="color: #ff3333;">[!] NO PUBLIC API DEFINITIONS REGISTERED FOR '${query.toUpperCase()}'.</span>`;
+                        return;
+                    }
+
+                    // Loop and render APIs with Generate Code trigger buttons
+                    let apiHtml = `<span style="color: #00ffcc;">[+] SECURE DIRECTORY ACCESS MATCHES: '${query.toUpperCase()}'</span><br><br>`;
+                    data.apis.forEach((api, index) => {
+                        // Generate dynamic fetch templates
+                        const rawSnippet = `// Fetch Request Template\nfetch('${api.url}')\n  .then(response => response.json())\n  .then(data => console.log(data))\n  .catch(err => console.error("Endpoint Offline:", err));`;
+                        
+                        apiHtml += `
+                            <span style="color: #00ffcc;">API ACCESS POINT: <a href="${api.url}" target="_blank" style="color: #00ffcc; text-decoration: underline;">${api.name}</a></span><br>
+                            <span style="color: #aaa;">INFO: ${api.description || 'No descriptive tags metadata provided.'}</span><br>
+                            <span style="color: #aaa;">CATEGORY: ${api.category || 'General Operations'}</span><br>
+                            <span style="color: #aaa;">AUTH REQUIREMENT: ${api.auth || 'Open/None'} | CORS STATUS: ${api.cors || 'No Block'}</span><br>
+                            <button class="terminal-btn" style="border-color: #00ffcc; color: #00ffcc;" onclick="toggleCode('api-code-${index}', \`${rawSnippet}\`)">[ GENERATE FETCH SCRIPT ]</button><br>
+                            <pre id="api-code-${index}" class="code-box" style="display:none; border-color: #00ffcc; color: #00ffcc; background-color: rgba(0, 15, 15, 0.8);"></pre>
+                            <span style="color: #226666;">------------------------------------</span><br><br>
+                        `;
+                    });
+                    resultsDiv.innerHTML = apiHtml;
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `
+                    <div style="color: #ff0000; border: 1px dashed #ff0000; padding: 15px; background: rgba(30, 0, 0, 0.6); font-size: 0.85rem; line-height: 1.5;">
+                        <span style="font-weight: bold;">[-] PIPELINE CONGESTION / ACCESS TIMEOUT</span><br><br>
+                        <span style="color: #aaa;">Reason: Render engine is currently spinning up from a low-power standby state.</span><br>
+                        <span style="color: #aaa;">Action: Please wait 30 seconds and execute the scan again.</span>
+                    </div>
+                `;
+            }
         }
+
+        // Matrix falling code background setup
         const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
         const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');

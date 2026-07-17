@@ -5,6 +5,7 @@ import datetime
 import os
 import re
 import urllib.parse
+import random
 
 app = Flask(__name__)
 CORS(app)
@@ -44,15 +45,20 @@ def assess_safety(url, source_name):
         score -= 15
     return min(100, max(0, score))
 
+# Helper to escape HTML characters so code blocks render properly in the frontend
+def escape_html(text):
+    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+# -------------------------------------------------------------
+# ROUTE 1 & 2: Dedicated Search (APKs and GitHub Repositories)
+# -------------------------------------------------------------
 @app.route('/search', methods=['GET'])
 def search():
     query = request.args.get('query', '').strip()
     if not query:
         return jsonify({"results": "<span style='color: red;'>[-] ERROR: Empty query.</span>"})
     
-    # -------------------------------------------------------------
-    # ROUTE 1: Dedicated APK/API Finder (Global Web Search Matrix)
-    # -------------------------------------------------------------
+    # Dedicated APK/API Finder (Global Web Search Matrix)
     if "apk" in query.lower():
         clean_keyword = query.lower().replace('apk', '').strip()
         encoded_keyword = urllib.parse.quote(clean_keyword)
@@ -83,21 +89,23 @@ def search():
                 current_date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
                 safety_color = "#00ff00" if safety_rating >= 80 else "#ffff00" if safety_rating >= 50 else "#ff0000"
                 
+                # Dynamic Code Snippet generation for APK download
+                js_snippet = escape_html(f"// Download Trigger\nwindow.open('{actual_url}', '_blank');")
+
                 results_html += f"<span style='color: #00ff00;'>TARGET LOCATION: <a href='{actual_url}' target='_blank' style='color: #00ff00; text-decoration: underline;'>{source_name}</a></span><br>"
                 results_html += f"<span style='color: {safety_color};'>SAFETY INTEGRITY: {safety_rating}/100</span><br>"
                 results_html += f"<span style='color: #aaa;'>LAST CHECKED: {current_date} (VERIFIED SAFE)</span><br>"
+                results_html += f"<button class='terminal-btn' onclick=\"toggleCode('apk-code-{i}', `{js_snippet}`)\">[ GENERATE SCRIPT ]</button><br>"
+                results_html += f"<pre id='apk-code-{i}' class='code-box' style='display:none;'></pre>"
                 results_html += "<span style='color: #444;'>--------------------------</span><br><br>"
             return jsonify({"results": results_html})
         except Exception as e:
             return jsonify({"results": f"<span style='color: red;'>[-] APK PIPELINE ERROR: {str(e)}</span>"})
 
-    # -------------------------------------------------------------
-    # ROUTE 2: Original TEK FINDER (Strict GitHub Repository Tracker)
-    # -------------------------------------------------------------
+    # Original TEK FINDER (Strict GitHub Repository Tracker)
     else:
         gh_search_url = f"https://api.github.com/search/repositories?q={urllib.parse.quote(query)}&sort=stars&order=desc&per_page=3"
         
-        # Modern standard headers including a required User-Agent
         headers = {
             "Accept": "application/vnd.github.v3+json",
             "User-Agent": "TEKFINDER-Core-Agent/1.0"
@@ -105,13 +113,11 @@ def search():
         
         github_token = os.environ.get('GITHUB_TOKEN')
         if github_token:
-            # Modernized REST authorization standard syntax
             headers['Authorization'] = f"Bearer {github_token.strip()}"
         
         try:
             response = requests.get(gh_search_url, headers=headers, timeout=10)
             
-            # Safe catch for non-JSON block pages (like Cloudflare raw HTML)
             try:
                 data = response.json()
             except ValueError:
@@ -135,16 +141,21 @@ def search():
                 return jsonify({"results": f"<span style='color: yellow;'>[!] NO TARGETS FOUND for '{query}'.</span>"})
             
             results_html = f"<span style='color: #00ff00;'>[+] TEKFINDER QUERY: '{query}'</span><br><br>"
-            for repo in data['items']:
+            for i, repo in enumerate(data['items']):
                 health = calculate_health(repo)
                 color = "#00ff00" if health > 70 else "#ffff00" if health > 40 else "#ff0000"
                 repo_url = repo.get('html_url', '#')
                 description = repo.get('description', 'No description provided by the developer.')
                 
+                # Dynamic Code Snippet generation for Git Clone
+                clone_snippet = escape_html(f"git clone {repo_url}.git")
+
                 results_html += f"<span style='color: {color};'>TARGET: <a href='{repo_url}' target='_blank' style='color: {color}; text-decoration: underline;'>{repo['full_name']}</a></span><br>"
                 results_html += f"<span style='color: #aaa;'>INFO: {description}</span><br>"
                 results_html += f"<span>HEALTH SCORE: {health}/100</span><br>"
                 results_html += f"<span>STARS: {repo['stargazers_count']}</span><br>"
+                results_html += f"<button class='terminal-btn' onclick=\"toggleCode('git-code-{i}', `{clone_snippet}`)\">[ GENERATE CLONE CMD ]</button><br>"
+                results_html += f"<pre id='git-code-{i}' class='code-box' style='display:none;'></pre>"
                 results_html += "<span style='color: #444;'>--------------------------</span><br><br>"
             return jsonify({"results": results_html})
         except Exception as e:
@@ -155,7 +166,6 @@ def search():
 # -------------------------------------------------------------
 @app.route('/trending', methods=['GET'])
 def get_trending():
-    # Route the trending list through Python using our secret token!
     url = "https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=3"
     headers = {
         "Accept": "application/vnd.github.v3+json",
@@ -171,7 +181,39 @@ def get_trending():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+# -------------------------------------------------------------
+# ROUTE 4: Public API Directory Search (CORS Bypass Engine)
+# -------------------------------------------------------------
+@app.route('/find-apis', methods=['GET'])
+def find_apis():
+    directory_url = "https://public-api-lists.github.io/public-api-lists/api/all.json"
+    try:
+        response = requests.get(directory_url, timeout=10)
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to fetch public API directory."}), 500
+            
+        data = response.json()
+        query = request.args.get('query', '').strip().lower()
+        
+        # If no query is provided, return 3 interesting random ones
+        if not query:
+            sample_apis = random.sample(data, min(3, len(data)))
+            return jsonify({"apis": sample_apis})
+            
+        # Filter the directory for matching APIs
+        matched_apis = []
+        for api in data:
+            if (query in api.get('name', '').lower() or 
+                query in api.get('description', '').lower() or 
+                query in api.get('category', '').lower()):
+                matched_apis.append(api)
+                if len(matched_apis) >= 3:  # Return top 3 matches
+                    break
+                    
+        return jsonify({"apis": matched_apis})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
-    # Dynamically bind to Render's port
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)

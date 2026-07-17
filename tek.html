@@ -94,6 +94,34 @@
         .trend-stats { font-size: 0.7rem; color: #00ff00; opacity: 0.8; }
         .highlight-star { color: #ffff00; }
 
+        /* BUTTON & CODE GENERATOR STYLES */
+        .terminal-btn {
+            background: transparent;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            margin: 8px 0;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .terminal-btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        .code-box {
+            background-color: rgba(0, 20, 0, 0.8);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
         /* MOBILE RESPONSIVE STYLES */
         @media (max-width: 850px) {
             body {
@@ -157,11 +185,11 @@
     </div>
     
     <script>
-        // Real-Time GitHub Popularity Tracker
+        // Real-Time GitHub Popularity Tracker - Routed Securely through Backend!
         async function loadTrendingRepos() {
             const trendingList = document.getElementById('trending-list');
             try {
-                const response = await fetch("https://api.github.com/search/repositories?q=stars:>1000&sort=stars&order=desc&per_page=3");
+                const response = await fetch("https://ai-tek-finder.onrender.com/trending");
                 if (!response.ok) throw new Error();
                 const data = await response.json();
                 
@@ -184,13 +212,43 @@
 
         window.onload = loadTrendingRepos;
 
-        // Smooth search query function with bulletproof timeout handling
+        // Toggle generation box visibility
+        function toggleCode(elementId, snippet) {
+            const codeBox = document.getElementById(elementId);
+            if (codeBox.style.display === "none") {
+                codeBox.innerHTML = snippet;
+                codeBox.style.display = "block";
+            } else {
+                codeBox.style.display = "none";
+            }
+        }
+
+        // Animated Terminal Loader helper
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Live AI Scrolling Scan Simulation 
         async function searchTech() {
             const query = document.getElementById('userInput').value.trim();
             const resultsDiv = document.getElementById('results');
             if(!query) return;
 
-            resultsDiv.innerHTML = "<span>[+] Establishing encrypted handshake...</span><br><span>[+] Wake signal sent to remote core...</span>";
+            // Live-scrolling diagnostic steps
+            const logSteps = [
+                "<span>[+] CONNECTING TO REMOTE DATA MATRIX PORT...</span>",
+                "<span>[+] HANDSHAKE SUCCESSFUL -> ESTABLISHING SECURE PROTOCOLS...</span>",
+                "<span>[+] SCANNING ACTIVE WEB NODES FOR '" + query.toUpperCase() + "'...</span>",
+                "<span>[+] ANALYZING TARGET INTEGRITY & EXTRACTING HEALTH METRICS...</span>",
+                "<span>[+] PARSING DYNAMIC DATA SCHEMAS...</span>"
+            ];
+
+            resultsDiv.innerHTML = "";
+            for (let i = 0; i < logSteps.length; i++) {
+                resultsDiv.innerHTML += logSteps[i] + "<br>";
+                resultsDiv.scrollTop = resultsDiv.scrollHeight; // Auto-scroll down
+                await sleep(400); // Create realistic terminal delay
+            }
             
             try {
                 const response = await fetch(`https://ai-tek-finder.onrender.com/search?query=${encodeURIComponent(query)}`);
