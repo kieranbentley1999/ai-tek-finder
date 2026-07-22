@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS STUDIO | Autonomous AI Workspace</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #000; color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: none; }
+        
+        header {
+            position: relative; z-index: 10;
+            background: rgba(0, 10, 0, 0.9);
+            border-bottom: 1px solid #00ff00;
+            padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-title { font-size: 1.2rem; font-weight: bold; letter-spacing: 2px; text-shadow: 0 0 8px #00ff00; }
+        .back-link { color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; }
+        .back-link:hover { background: #00ff00; color: #000; }
+
+        .studio-workspace {
+            position: relative; z-index: 10;
+            display: grid;
+            grid-template-columns: 320px 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            height: calc(100vh - 55px);
+            background: rgba(0, 0, 0, 0.85);
+        }
+
+        .panel {
+            background: rgba(0, 15, 0, 0.7);
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+        }
+        .panel-header {
+            background: rgba(0, 30, 0, 0.8);
+            border-bottom: 1px solid rgba(0, 255, 0, 0.4);
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px #00ff00;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .prompt-body { padding: 15px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; }
+        textarea.prompt-input {
+            width: 100%; height: 140px;
+            background: rgba(0, 0, 0, 0.8); border: 1px solid #00ff00;
+            color: #00ff00; padding: 10px;
+            font-family: 'Courier New', monospace; font-size: 0.85rem;
+            outline: none; resize: none;
+        }
+        select, button.action-btn {
+            background: transparent; border: 1px solid #00ff00;
+            color: #00ff00; padding: 10px; font-family: 'Courier New', monospace;
+            font-size: 0.85rem; cursor: pointer; outline: none; text-transform: uppercase;
+        }
+        select option { background: #000; color: #00ff00; }
+        button.action-btn:hover { background: #00ff00; color: #000; font-weight: bold; }
+
+        .preset-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .preset-btn {
+            background: rgba(0, 255, 0, 0.05); border: 1px dashed rgba(0, 255, 0, 0.3);
+            color: #aaa; padding: 8px; font-size: 0.75rem; text-align: left; cursor: pointer;
+        }
+        .preset-btn:hover { border-color: #00ff00; color: #00ff00; background: rgba(0, 255, 0, 0.1); }
+
+        .editor-tabs { display: flex; gap: 2px; background: #000; border-bottom: 1px solid rgba(0, 255, 0, 0.3); }
+        .tab {
+            padding: 6px 12px; font-size: 0.75rem; color: #888;
+            cursor: pointer; border: 1px solid transparent; background: rgba(0, 10, 0, 0.5);
+        }
+        .tab.active { color: #00ff00; border-color: rgba(0, 255, 0, 0.4); border-bottom: 1px solid #000; background: rgba(0, 25, 0, 0.8); }
+        textarea.code-editor {
+            flex-grow: 1; width: 100%;
+            background: rgba(0, 5, 0, 0.95); border: none;
+            color: #00ff00; padding: 12px;
+            font-family: 'Courier New', monospace; font-size: 0.85rem;
+            outline: none; resize: none; white-space: pre; overflow: auto;
+        }
+
+        iframe.preview-frame {
+            width: 100%; height: 100%; border: none; background: #fff;
+        }
+
+        @media (max-width: 1100px) {
+            body { overflow-y: auto; }
+            .studio-workspace { grid-template-columns: 1fr; height: auto; }
+            .panel { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrixCanvas"></canvas>
+
+    <header>
+        <div class="header-title">> NEXUS STUDIO WORKSPACE _</div>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
+    </header>
+
+    <main class="studio-workspace">
+        <section class="panel">
+            <div class="panel-header">
+                <span>[ 1. INTENT ENGINE ]</span>
+                <span style="font-size: 0.7rem; color: #888;">AI MODEL: NEXUS-v3</span>
+            </div>
+            <div class="prompt-body">
+                <textarea id="appPrompt" class="prompt-input" placeholder="Describe what you want to build in plain English... (e.g. 'Build a modern dark-mode pomodoro timer with sound alerts')"></textarea>
+                
+                <button onclick="generateApp()" class="action-btn">[ 🚀 GENERATE & LAUNCH ]</button>
+
+                <div class="preset-list">
+                    <span style="font-size: 0.75rem; color: #fff;">QUICK STARTER TEMPLATES:</span>
+                    <button class="preset-btn" onclick="loadPreset('pomodoro')">⏱️ Pomodoro Productivity Timer</button>
+                    <button class="preset-btn" onclick="loadPreset('crypto')">📈 Live Crypto Price Ticker Card</button>
+                    <button class="preset-btn" onclick="loadPreset('todo')">📋 Kanban Task Workspace</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <span>[ 2. SOURCE CODE ]</span>
+                <button onclick="updatePreviewFromEditor()" class="action-btn" style="padding: 2px 8px; font-size: 0.7rem;">[ REFRESH PREVIEW ]</button>
+            </div>
+            <div class="editor-tabs">
+                <div id="tab-html" class="tab active" onclick="switchTab('html')">index.html</div>
+                <div id="tab-css" class="tab" onclick="switchTab('css')">styles.css</div>
+                <div id="tab-js" class="tab" onclick="switchTab('js')">app.js</div>
+            </div>
+            <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <span>[ 3. LIVE INTERACTIVE PREVIEW ]</span>
+                <span id="previewStatus" style="font-size: 0.7rem; color: #00ff00;">● LIVE</span>
+            </div>
+            <iframe id="previewFrame" class="preview-frame"></iframe>
+        </section>
+    </main>
+
+    <script src="studio.js"></script>
+</body>
+</html>
