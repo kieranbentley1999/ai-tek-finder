@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEKFINDER Systems Documentation</title>
+    <title>NEXUS System Documentation | $NEXUS</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -13,10 +13,12 @@
             display: flex; justify-content: center; align-items: center;
         }
         #matrixCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+        
         .terminal-container {
             position: relative; z-index: 10; 
-            background-color: rgba(0, 0, 0, 0.85); border: 1px solid #00ff00; 
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 90%; max-width: 800px; padding: 35px 30px;
+            background-color: rgba(0, 0, 0, 0.9); border: 1px solid #00ff00; 
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.3); width: 95%; max-width: 900px; padding: 35px 30px;
+            height: 90vh; display: flex; flex-direction: column;
         }
         .corner {
             position: absolute; color: #00ff00; font-size: 1.2rem; line-height: 1; background: #000;
@@ -26,56 +28,41 @@
         .c-bl { bottom: -9px; left: -6px; padding: 0 4px; }
         .c-br { bottom: -9px; right: -6px; padding: 0 4px; }
         
-        h1 { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
-        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; }
+        h1 { font-size: 1.8rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 5px; }
+        .back-link { display: inline-block; color: #00ff00; text-decoration: none; border: 1px solid #00ff00; padding: 4px 10px; font-size: 0.8rem; margin-bottom: 20px; font-weight: bold; width: fit-content;}
         .back-link:hover { background: #00ff00; color: #000; }
-        
-        .docs-body {
+
+        /* Doc Scroll Window */
+        .doc-content {
             border: 1px dashed rgba(0, 255, 0, 0.5);
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 5, 0, 0.8);
             padding: 25px;
-            height: 380px;
+            flex-grow: 1;
             overflow-y: auto;
             font-size: 0.9rem;
-            line-height: 1.6;
+            line-height: 1.5;
         }
-        h2 { font-size: 1.1rem; color: #fff; margin-top: 20px; margin-bottom: 8px; border-bottom: 1px solid rgba(0, 255, 0, 0.3); padding-bottom: 4px; }
+
+        h2 { color: #fff; text-shadow: 0 0 5px #00ff00; font-size: 1.2rem; margin-top: 25px; margin-bottom: 10px; border-bottom: 1px solid rgba(0, 255, 0, 0.3); padding-bottom: 5px; text-transform: uppercase;}
         h2:first-of-type { margin-top: 0; }
-        p { margin-bottom: 15px; color: #00ff00; }
-        ul { margin-left: 20px; margin-bottom: 15px; }
+        h3 { color: #00ffcc; font-size: 1rem; margin-top: 15px; margin-bottom: 5px; }
+        p { margin-bottom: 15px; color: #aaa; }
+        ul { margin-bottom: 15px; padding-left: 20px; }
         li { margin-bottom: 5px; color: #aaa; }
         strong { color: #00ff00; }
+        
+        .accent-box {
+            border-left: 3px solid #00ff00;
+            background: rgba(0, 255, 0, 0.05);
+            padding: 10px 15px;
+            margin: 15px 0;
+        }
 
-        /* MOBILE RESPONSIVE STYLES */
+        /* Responsive */
         @media (max-width: 768px) {
-            body {
-                overflow-y: auto;
-                align-items: flex-start;
-                padding: 15px;
-            }
-            .terminal-container {
-                width: calc(100% - 30px);
-                margin: 20px auto;
-                padding: 25px 15px;
-            }
-            h1 {
-                font-size: 1.3rem;
-                letter-spacing: 1px;
-            }
-            .back-link {
-                margin-bottom: 15px;
-                padding: 4px 8px;
-                font-size: 0.75rem;
-            }
-            .docs-body {
-                padding: 15px;
-                height: 420px; 
-                font-size: 0.85rem;
-            }
-            h2 {
-                font-size: 1rem;
-                margin-top: 15px;
-            }
+            .terminal-container { padding: 20px 15px; height: 95vh; }
+            h1 { font-size: 1.3rem; }
+            .doc-content { padding: 15px; }
         }
     </style>
 </head>
@@ -86,36 +73,51 @@
         <span class="corner c-tr">+</span>
         <span class="corner c-bl">+</span>
         <span class="corner c-br">+</span>
-        <a href="index.html" class="back-link"><_ BACK TO HUB</a>
+        <a href="index.html" class="back-link"><< BACK TO HUB</a>
         <h1>> SYSTEM DOCUMENTATION _</h1>
         <br>
-        <div class="docs-body">
-            <h2>1. OVERVIEW</h2>
-            <p><strong>TEKFINDER ($TEKFIND)</strong> is a decentralized, terminal-styled intelligence suite engineered to analyze open-source codebases, index development trends, and scan global file networks to keep builders safe and updated.</p>
+
+        <div class="doc-content">
+            <h2>1. Tokenomics & Brand Identity</h2>
+            <p>The core computational power of the platform is fueled by the <strong>NEXUS</strong> utility engine. Our digital asset infrastructure is built on precision, community scaling, and high-performance routing protocols.</p>
+            <ul>
+                <li><strong>Token Name:</strong> NEXUS</li>
+                <li><strong>Ticker Symbol:</strong> $NEXUS</li>
+                <li><strong>Deployer Contract Address:</strong> <code style="color: #fff; background: rgba(0,255,0,0.1); padding: 2px 6px;">2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump</code></li>
+            </ul>
+            <div class="accent-box">
+                <strong>SYSTEM NOTE:</strong> The token contract acts as the cryptographical authentication layer designed to secure API requests, unlock system capabilities, and map operational mechanics.
+            </div>
+
+            <h2>2. Platform Architecture</h2>
+            <p>The NEXUS terminal utilizes a secure hybrid topology, leveraging both a high-performance Python Flask backend (hosted via Render container nodes) and modern WebAssembly (Wasm) frontends operating directly in the client sandbox.</p>
             
-            <h2>2. PLATFORM UTILITY</h2>
+            <h3>A. TEK FINDER (GitHub Core Scanner)</h3>
+            <p>Tracks open-source software libraries, repo development trajectories, and performs advanced health scans using a customized algorithmic matrix. Filters output parameters based on open issues, codebase updates, and community volume.</p>
+            
+            <h3>B. APK / API Finder Suite</h3>
+            <p>Dual-lane querying system executing global package safety checks and public API lookup protocols:</p>
             <ul>
-                <li><strong>TEK FINDER:</strong> Connects to the GitHub API to crawl repositories, evaluate live code architecture, calculate active health rankings, and track developers' community engagement metrics.</li>
-                <li><strong>APK / API FINDER:</strong> Acts as an autonomous agent that searches multi-index repositories to verify, categorize, and safety-score downloadable application files and connection protocols.</li>
+                <li><strong>APK Crawler:</strong> Scrapes target locations via DuckDuckGo backplane channels, running URLs through safety integrity math and calculating an active vulnerability score.</li>
+                <li><strong>Public API Directory:</strong> Hits an internal Python route connected to a master library of over 700+ verified APIs, returning live schema parameters and generating functional JavaScript fetch code scripts.</li>
             </ul>
 
-            <h2>3. TOKENOMICS ($TEKFIND)</h2>
-            <p>The native utility token powers the ecosystem. In upcoming releases, holding $TEKFIND will unlock advanced, zero-limit scanning pipelines, premium API keys, and custom interface layers.</p>
+            <h3>C. Universal File Transformer</h3>
+            <p>Runs a sandboxed, zero-server-leak transformation facility directly inside the browser. By utilizing client-side execution nodes, user files never hit external networks — ensuring total cryptographic privacy.</p>
             <ul>
-                <li><strong>Token Name:</strong> TEKFINDER</li>
-                <li><strong>Ticker:</strong> $TEKFIND</li>
-                <li><strong>Launch Platform:</strong> pump.fun</li>
+                <li><strong>Image Converter:</strong> Canvas-allocated mapping transforming web-ready formats (PNG, JPEG, WEBP) instantly.</li>
+                <li><strong>HEIC Decoder:</strong> Implements a client-side WebAssembly compiler layer to handle proprietary Apple formats inside browser memory.</li>
+                <li><strong>PDF Document Compiler:</strong> Dynamically compiles and packages scale-accurate image data straight into document formats.</li>
+                <li><strong>AI Text Scan (OCR):</strong> Leverages Tesseract neural engine scripts to read pixel grids locally and extract raw string arrays from screenshots or forms.</li>
             </ul>
 
-            <h2>4. DEVELOPMENT ROADMAP</h2>
-            <ul>
-                <li><strong>Phase 1:</strong> Portal launch and community activation (Completed).</li>
-                <li><strong>Phase 2:</strong> Deployment of separate scanner sub-systems (Active).</li>
-                <li><strong>Phase 3:</strong> API key integration for zero-limit community searching.</li>
-                <li><strong>Phase 4:</strong> Private beta for native desktop and mobile interface ports.</li>
-            </ul>
+            <h2>3. Security Guidelines & Protocols</h2>
+            <p>All operations are protected by sandboxed executions. The client-side converter operates under strict local constraints — at no point are your images, PDFs, or private scan documents uploaded to any backend database. All remote calls to our Flask server are fully encrypted over HTTPS protocols.</p>
+            <br>
+            <p style="text-align: center; color: #00ffcc;">[ END OF TRANSMISSION // SYSTEM READY FOR LAUNCH ]</p>
         </div>
     </div>
+
     <script>
         const canvas = document.getElementById('matrixCanvas'); const ctx = canvas.getContext('2d');
         canvas.height = window.innerHeight; canvas.width = window.innerWidth;
@@ -130,6 +132,13 @@
             });
         }
         setInterval(draw, 35);
+
+        // Silent Traffic Tracker
+        fetch("https://ai-tek-finder.onrender.com/api/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ page: window.location.pathname.split("/").pop() || "docs.html" })
+        }).catch(err => console.log("Tracker silent fail"));
     </script>
 </body>
 </html>

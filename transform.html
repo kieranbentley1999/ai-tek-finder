@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal File Transformer</title>
+    <title>NEXUS | Universal File Transformer</title>
     
     <!-- ENGINE 1: Tesseract OCR for text extraction -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -303,6 +303,13 @@
             });
         }
         setInterval(draw, 35);
+
+        // Silent Traffic Tracker
+        fetch("https://ai-tek-finder.onrender.com/api/track", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ page: window.location.pathname.split("/").pop() || "transform.html" })
+        }).catch(err => console.log("Tracker silent fail"));
     </script>
 </body>
 </html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS Admin Console</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #000; color: #00ff00; font-family: 'Courier New', Courier, monospace; height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px;}
+        .admin-container { background: rgba(0, 15, 0, 0.9); border: 1px solid #00ff00; box-shadow: 0 0 30px rgba(0, 255, 0, 0.2); width: 100%; max-width: 900px; padding: 30px; }
+        h1 { font-size: 1.5rem; border-bottom: 1px dashed #00ff00; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        
+        /* Login Screen */
+        #login-screen { text-align: center; }
+        input { background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 10px; font-family: inherit; width: 60%; margin-bottom: 15px; outline: none; }
+        button { background: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 10px 20px; cursor: pointer; font-family: inherit; font-weight: bold; }
+        button:hover { background: #00ff00; color: #000; }
+
+        /* Dashboard Screen */
+        #dashboard-screen { display: none; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .stat-box { border: 1px solid rgba(0, 255, 0, 0.5); padding: 15px; text-align: center; background: rgba(0,255,0,0.05); }
+        .stat-val { font-size: 2.5rem; font-weight: bold; margin-top: 10px; text-shadow: 0 0 10px #00ff00;}
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem;}
+        th, td { border: 1px solid rgba(0,255,0,0.3); padding: 8px; text-align: left; }
+        th { background: rgba(0,255,0,0.1); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>> SYSTEM ADMIN OVERRIDE _</h1>
+
+        <!-- AUTHENTICATION -->
+        <div id="login-screen">
+            <p style="margin-bottom: 15px;">ENTER ROOT PASSKEY TO ACCESS METRICS</p>
+            <input type="password" id="passkey" placeholder="••••••••••••"><br>
+            <button onclick="fetchMetrics()">[ DECRYPT ARCHIVE ]</button>
+            <div id="login-error" style="color: red; margin-top: 10px;"></div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard-screen">
+            <div class="grid">
+                <div class="stat-box">
+                    <div>TOTAL TRAFFIC (HITS)</div>
+                    <div class="stat-val" id="totalHits">0</div>
+                </div>
+                <div class="stat-box">
+                    <div>UNIQUE VISITORS (IPs)</div>
+                    <div class="stat-val" id="uniqueHits">0</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 20px;">[ RECENT NETWORK SEARCHES ]</h3>
+            <table>
+                <thead><tr><th>Query Target</th><th>Protocol Type</th><th>Timestamp</th></tr></thead>
+                <tbody id="searchesTable"></tbody>
+            </table>
+
+            <h3 style="margin-top: 20px;">[ PAGE POPULARITY MATRIX ]</h3>
+            <table>
+                <thead><tr><th>Location File</th><th>Total Visits</th></tr></thead>
+                <tbody id="pagesTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        async function fetchMetrics() {
+            const key = document.getElementById('passkey').value;
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.innerHTML = "Authenticating...";
+
+            try {
+                const response = await fetch(`https://ai-tek-finder.onrender.com/api/admin/metrics?passkey=${key}`);
+                if (!response.ok) throw new Error("ACCESS DENIED");
+                
+                const data = await response.json();
+                
+                // Transition UI
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+
+                // Populate Data
+                document.getElementById('totalHits').innerText = data.total_visits;
+                document.getElementById('uniqueHits').innerText = data.unique_visitors;
+
+                let searchHtml = "";
+                data.recent_searches.forEach(s => { searchHtml += `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`; });
+                document.getElementById('searchesTable').innerHTML = searchHtml;
+
+                let pageHtml = "";
+                data.popular_pages.forEach(p => { pageHtml += `<tr><td>${p[0]}</td><td>${p[1]}</td></tr>`; });
+                document.getElementById('pagesTable').innerHTML = pageHtml;
+
+            } catch (err) {
+                errorDiv.innerHTML = "[-] ENCRYPTION KEY INVALID";
+            }
+        }
+    </script>
+</body>
+</html>

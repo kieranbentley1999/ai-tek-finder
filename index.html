@@ -27,6 +27,7 @@
             z-index: 1; 
         }
 
+        /* MASSIVE TOP BRAND HEADER */
         .master-brand-header {
             position: relative;
             z-index: 10;
@@ -58,6 +59,7 @@
             to { text-shadow: 0 0 25px rgba(0, 255, 0, 0.9), 0 0 50px rgba(0, 255, 0, 0.5); }
         }
 
+        /* PREMIUM TOKEN CONTRACT ADDRESS STYLE */
         .token-ca-box {
             margin-top: 12px;
             font-size: 0.8rem;
@@ -91,7 +93,7 @@
             box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
             width: 95%;
             max-width: 1200px;
-            padding: 35px 30px;
+            padding: 30px 25px;
         }
         .corner {
             position: absolute;
@@ -118,25 +120,23 @@
             opacity: 0.7;
             font-size: 0.85rem;
             letter-spacing: 1px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
         }
         .cursor { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         
-        /* 5-Card Grid Setup */
+        /* 6-Card Grid (3x2 Desktop Layout) */
         .hub-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
             margin-top: 10px;
-            min-height: 220px;
-            align-items: stretch;
         }
         .hub-card {
             background: rgba(0, 20, 0, 0.3);
             border: 1px solid rgba(0, 255, 0, 0.4);
-            padding: 20px 12px;
+            padding: 20px 15px;
             text-align: center;
             text-decoration: none;
             color: #00ff00;
@@ -152,36 +152,67 @@
             transform: translateY(-2px);
         }
         .hub-card h2 {
-            font-size: 1.05rem;
-            margin-bottom: 12px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
             letter-spacing: 1px;
         }
         .hub-card p {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
             color: #aaa;
             line-height: 1.4;
         }
 
-        @media (max-width: 950px) {
+        /* HARD MOBILE OVERRIDE FIX */
+        @media (max-width: 900px) {
             body {
                 overflow-y: auto !important;
                 align-items: center !important;
                 justify-content: flex-start !important;
                 padding: 15px !important;
             }
+            .master-brand-header {
+                margin-top: 20px !important;
+                margin-bottom: 15px !important;
+            }
+            .master-brand-logo {
+                width: 70px !important;
+                margin-bottom: 10px !important;
+            }
             .master-brand-title {
                 font-size: 2.2rem !important;
                 letter-spacing: 6px !important;
+            }
+            .token-ca-box {
+                font-size: 0.7rem !important;
+                padding: 6px 12px !important;
             }
             .terminal-container {
                 width: calc(100% - 24px) !important; 
                 margin: 0 auto 30px auto !important;
                 padding: 25px 15px !important;
             }
+            h1 {
+                font-size: 1.3rem !important;
+            }
+            .subtitle {
+                font-size: 0.7rem !important;
+                margin-bottom: 25px !important;
+            }
             .hub-grid {
                 display: flex !important;
                 flex-direction: column !important; 
                 gap: 15px !important;
+            }
+            .hub-card {
+                padding: 18px 15px !important;
+                width: 100% !important;
+            }
+            .hub-card h2 {
+                font-size: 1.05rem !important;
+                margin-bottom: 6px !important;
+            }
+            .hub-card p {
+                font-size: 0.75rem !important;
             }
         }
     </style>
@@ -192,6 +223,7 @@
     <div class="master-brand-header">
         <img src="logo.png" alt="NEXUS LOGO" class="master-brand-logo" onerror="this.style.display='none';">
         <div class="master-brand-title">NEXUS</div>
+        <!-- INTERACTIVE CONTRACT ADDRESS CONTAINER -->
         <div class="token-ca-box" onclick="copyContractAddress(this)">
             <span class="ca-label">CA:</span> <span id="ca-string">2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump</span>
         </div>
@@ -207,34 +239,40 @@
         <div class="subtitle">CENTRAL PORTAL HUB // WELCOME USER // $NEXUS</div>
         
         <div class="hub-grid">
-            <!-- Card 1: GitHub Platform -->
+            <!-- Card 1: AI Studio Workspace -->
+            <a href="studio.html" class="hub-card">
+                <h2>[ AI STUDIO ]</h2>
+                <p>Build, test, and render complete web applications from plain text prompts in real-time.</p>
+            </a>
+            <!-- Card 2: GitHub Platform -->
             <a href="tek.html" class="hub-card">
                 <h2>[ TEK FINDER ]</h2>
                 <p>Launch global queries to analyze open-source code and track repository health ratings.</p>
             </a>
-            <!-- Card 2: APK Platform -->
-            <a href="apk.html" class="hub-card">
-                <h2>[ APK/API FINDER ]</h2>
-                <p>Track live application packages and check safety integrity ratings across the web.</p>
-            </a>
-            <!-- Card 3: Standalone Code Translator -->
+            <!-- Card 3: Code Language Translator -->
             <a href="translate.html" class="hub-card">
                 <h2>[ TRANSLATOR ]</h2>
                 <p>Instantly convert Python code snippets to TypeScript, Rust, or Go syntax on the fly.</p>
             </a>
-            <!-- Card 4: Universal File Transformer -->
+            <!-- Card 4: APK Platform -->
+            <a href="apk.html" class="hub-card">
+                <h2>[ APK/API FINDER ]</h2>
+                <p>Track live application packages and check safety integrity ratings across the web.</p>
+            </a>
+            <!-- Card 5: Universal File Transformer -->
             <a href="transform.html" class="hub-card">
                 <h2>[ TRANS-FORMER ]</h2>
                 <p>Process, convert, and compress file types or extract raw text from images entirely locally.</p>
             </a>
-            <!-- Card 5: Project Documentation -->
+            <!-- Card 6: Project Documentation -->
             <a href="docs.html" class="hub-card">
                 <h2>[ SYSTEM DOCS ]</h2>
-                <p>Review the master blueprint, whitepaper, token utility mechanics, and roadmap.</p>
+                <p>Review the master blueprint, whitepaper, token utility mechanics, and the roadmap.</p>
             </a>
         </div>
     </div>
     <script>
+        // Copy Token Address to Clipboard
         function copyContractAddress(containerElement) {
             const caAddress = "2y1u8AKHWukXcWxgTDJr8gfLuiLR3zVJussnPHp7pump";
             navigator.clipboard.writeText(caAddress).then(() => {
@@ -268,6 +306,7 @@
         }
         setInterval(draw, 35);
 
+        // Silent Traffic Tracker
         fetch("https://ai-tek-finder.onrender.com/api/track", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
