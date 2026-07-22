@@ -40,7 +40,7 @@ def escape_html(text):
     return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 # -------------------------------------------------------------
-# ROUTE: NEXUS Studio AI App Generator Engine
+# ROUTE: NEXUS Studio AI App Generator Engine (Direct REST API)
 # -------------------------------------------------------------
 @app.route('/generate-app', methods=['POST'])
 def generate_app():
@@ -54,12 +54,14 @@ def generate_app():
 
     groq_api_key = os.environ.get('GROQ_API_KEY')
 
-    # IF GROQ API KEY IS PROVIDED: USE LIVE LLM GENERATION
+    # IF GROQ API KEY IS SET: USE DIRECT REST API CALL TO GROQ
     if groq_api_key:
         try:
-            from groq import Groq
-            client = Groq(api_key=groq_api_key)
-
+            headers = {
+                "Authorization": f"Bearer {groq_api_key.strip()}",
+                "Content-Type": "application/json"
+            }
+            
             system_instruction = (
                 "You are the NEXUS AI Application Generator engine. "
                 "The user will describe a web application in plain English. "
@@ -69,33 +71,38 @@ def generate_app():
                 "2. 'html' must contain body elements only (no <html>, <head>, or <script> tags).\n"
                 "3. 'css' must contain styling only (no <style> tags).\n"
                 "4. 'js' must contain interactive JavaScript logic only (no <script> tags).\n"
-                "5. Ensure green/dark mode styling matching the NEXUS matrix theme when appropriate."
+                "5. Ensure dark/matrix theme styling matching the NEXUS theme when appropriate."
             )
 
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=[
+            payload = {
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
                     {"role": "system", "content": system_instruction},
-                    {"role": "user", "content": f"Build this app: {prompt}"}
+                    {"role": "user", "content": f"Build a complete web app: {prompt}"}
                 ],
-                temperature=0.2,
-                response_format={"type": "json_object"}
-            )
+                "response_format": {"type": "json_object"},
+                "temperature": 0.2
+            }
 
-            result_text = response.choices[0].message.content
-            app_data = json.loads(result_text)
+            res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=20)
+            
+            if res.status_code == 200:
+                result_json = res.json()
+                content_text = result_json['choices'][0]['message']['content']
+                app_data = json.loads(content_text)
 
-            return jsonify({
-                "html": app_data.get("html", "<div>App generation failed</div>"),
-                "css": app_data.get("css", "body { background: #000; color: #00ff00; }"),
-                "js": app_data.get("js", "// No JS provided")
-            })
+                return jsonify({
+                    "html": app_data.get("html", "<div>App generation error</div>"),
+                    "css": app_data.get("css", "body { background: #000; color: #00ff00; }"),
+                    "js": app_data.get("js", "// No JS generated")
+                })
+            else:
+                print("Groq API Error Code:", res.status_code, res.text)
 
         except Exception as e:
-            print("Groq AI Engine Error:", str(e))
-            # Fallthrough to fallback builder if API fails
+            print("Groq API Request Exception:", str(e))
 
-    # FALLBACK BUILT-IN TEMPLATE BUILDER (No API Key Required)
+    # FALLBACK ENGINE IF GROQ KEY IS MISSING OR API FAILS
     title_clean = prompt.upper()
     fallback_html = f"""<div class="app-card">
   <h2>{title_clean}</h2>
