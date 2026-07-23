@@ -44,7 +44,7 @@ function updatePreviewFromEditor() {
 }
 
 // -------------------------------------------------------------
-# LIVE BACKEND GENERATE ENGINE CALL (WITH ITERATIVE MODIFICATION)
+// LIVE BACKEND GENERATE ENGINE CALL (WITH ITERATIVE MODIFICATION)
 // -------------------------------------------------------------
 async function generateApp() {
     var promptInput = document.getElementById('appPrompt');
@@ -52,7 +52,6 @@ async function generateApp() {
     var prompt = promptInput.value.trim();
     if (!prompt) return;
 
-    // Save current active editor contents into memory before sending
     var editorElem = document.getElementById('codeEditor');
     if (editorElem) {
         currentCode[activeTab] = editorElem.value;
@@ -136,7 +135,6 @@ window.onload = function() {
     }
     updatePreview();
 
-    // Matrix Background Effect
     var canvas = document.getElementById('matrixCanvas'); 
     if (canvas) {
         var ctx = canvas.getContext('2d');
