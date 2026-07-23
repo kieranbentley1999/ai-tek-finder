@@ -69,11 +69,14 @@ def generate_app():
         }
         
         system_instruction = (
-            "You are the NEXUS AI Application Generator. "
-            "Build a functional web application based on the user request. "
-            "Return JSON format with exact keys: 'html', 'css', 'js'. "
-            "Do not include HTML wrapper tags (like <!DOCTYPE>, <html>, <head>, or <body>). "
-            "Only return valid JSON inside."
+            "You are the NEXUS AI Application Generator engine. "
+            "Build a full web app from the user request. "
+            "Return ONLY a JSON object with 3 keys: 'html', 'css', and 'js'.\n\n"
+            "RULES:\n"
+            "1. Output valid JSON only (no markdown wrapping, no ```json or ```).\n"
+            "2. 'html' contains body elements only.\n"
+            "3. 'css' contains clean CSS styling only.\n"
+            "4. 'js' contains full working JavaScript interactive logic."
         )
 
         models_to_try = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
@@ -84,23 +87,28 @@ def generate_app():
                     "model": model_id,
                     "messages": [
                         {"role": "system", "content": system_instruction},
-                        {"role": "user", "content": f"Build a complete web app: {prompt}"}
+                        {"role": "user", "content": f"Build a complete web app for: {prompt}"}
                     ],
+                    "response_format": {"type": "json_object"},
                     "temperature": 0.2
                 }
 
-                res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=25)
+                res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=20)
                 
                 if res.status_code == 200:
                     result_json = res.json()
                     content_text = result_json['choices'][0]['message']['content'].strip()
                     
-                    # Clean response markdown syntax if model returns ```json wrapper
-                    if "```" in content_text:
-                        content_text = re.sub(r'```(?:json)?\n?', '', content_text)
-                        content_text = content_text.rstrip('`').strip()
+                    # Clean out markdown block wrappers if present
+                    if content_text.startswith("```"):
+                        content_text = re.sub(r'^```(?:json)?\n?', '', content_text)
+                        content_text = re.sub(r'\n?```$', '', content_text).strip()
 
-                    app_data = json.loads(content_text)
+                    # Handle control characters (\n, \t) inside raw model JSON output safely
+                    try:
+                        app_data = json.loads(content_text)
+                    except json.JSONDecodeError:
+                        app_data = json.loads(content_text, strict=False)
 
                     return jsonify({
                         "html": app_data.get("html", "<div>App generation error</div>"),
@@ -108,12 +116,12 @@ def generate_app():
                         "js": app_data.get("js", "// No JS generated")
                     })
                 else:
-                    print(f"Groq API Model {model_id} Error Code: {res.status_code} - {res.text}")
+                    print(f"Groq API Model {model_id} Error: {res.status_code} - {res.text}")
 
             except Exception as e:
                 print(f"Groq API Exception for {model_id}: {str(e)}")
 
-    # FALLBACK ENGINE
+    # FALLBACK ENGINE IF ALL ELSE FAILS
     title_clean = prompt.upper()
     fallback_html = f"""<div class="app-card">
   <h2>{title_clean}</h2>
