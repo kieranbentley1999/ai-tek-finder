@@ -6,8 +6,16 @@ var currentCode = {
 
 var activeTab = 'html';
 
+function getEditor() {
+    return document.getElementById('codeEditor') || document.querySelector('.panel textarea') || document.querySelectorAll('textarea')[1];
+}
+
+function getPromptInput() {
+    return document.getElementById('appPrompt') || document.querySelector('textarea');
+}
+
 function switchTab(tab) {
-    var editorElem = document.getElementById('codeEditor');
+    var editorElem = getEditor();
     if (editorElem) {
         currentCode[activeTab] = editorElem.value;
     }
@@ -17,17 +25,19 @@ function switchTab(tab) {
     for (var i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
     }
+    
     var activeTabElem = document.getElementById('tab-' + tab);
     if (activeTabElem) {
         activeTabElem.classList.add('active');
     }
+    
     if (editorElem) {
         editorElem.value = currentCode[activeTab];
     }
 }
 
 function updatePreview() {
-    var frame = document.getElementById('previewFrame');
+    var frame = document.getElementById('previewFrame') || document.querySelector('iframe');
     if (!frame) return;
     var doc = frame.contentDocument || frame.contentWindow.document;
     doc.open();
@@ -36,7 +46,7 @@ function updatePreview() {
 }
 
 function updatePreviewFromEditor() {
-    var editorElem = document.getElementById('codeEditor');
+    var editorElem = getEditor();
     if (editorElem) {
         currentCode[activeTab] = editorElem.value;
     }
@@ -44,15 +54,15 @@ function updatePreviewFromEditor() {
 }
 
 // -------------------------------------------------------------
-// LIVE BACKEND GENERATE ENGINE CALL (WITH ITERATIVE MODIFICATION)
+// LIVE BACKEND GENERATE ENGINE CALL
 // -------------------------------------------------------------
 async function generateApp() {
-    var promptInput = document.getElementById('appPrompt');
+    var promptInput = getPromptInput();
     if (!promptInput) return;
     var prompt = promptInput.value.trim();
     if (!prompt) return;
 
-    var editorElem = document.getElementById('codeEditor');
+    var editorElem = getEditor();
     if (editorElem) {
         currentCode[activeTab] = editorElem.value;
     }
@@ -115,7 +125,7 @@ async function generateApp() {
 }
 
 function loadPreset(type) {
-    var promptInput = document.getElementById('appPrompt');
+    var promptInput = getPromptInput();
     if (!promptInput) return;
 
     if (type === 'pomodoro') {
@@ -128,8 +138,8 @@ function loadPreset(type) {
     generateApp();
 }
 
-window.onload = function() {
-    var editorElem = document.getElementById('codeEditor');
+window.addEventListener('DOMContentLoaded', function() {
+    var editorElem = getEditor();
     if (editorElem) {
         editorElem.value = currentCode.html;
     }
@@ -160,4 +170,4 @@ window.onload = function() {
         }
         setInterval(drawMatrix, 35);
     }
-};
+});
