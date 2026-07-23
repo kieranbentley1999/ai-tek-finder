@@ -31,24 +31,54 @@ function updatePreviewFromEditor() {
     updatePreview();
 }
 
-function generateApp() {
+// -------------------------------------------------------------
+// LIVE BACKEND GENERATE ENGINE CALL
+// -------------------------------------------------------------
+async function generateApp() {
     var prompt = document.getElementById('appPrompt').value.trim();
     if (!prompt) return;
 
-    document.getElementById('previewStatus').innerText = "⏳ GENERATING APP...";
-    document.getElementById('previewStatus').style.color = "#ffff00";
+    var statusElem = document.getElementById('previewStatus');
+    statusElem.innerText = "⏳ GENERATING LIVE AI APP...";
+    statusElem.style.color = "#ffff00";
 
-    setTimeout(function() {
-        currentCode.html = '<div class="app-container">\n  <h2>' + prompt.toUpperCase() + '</h2>\n  <div id="counter">0</div>\n  <button onclick="increment()">Increment Counter</button>\n</div>';
-        currentCode.css = 'body { background: #050505; color: #00ff00; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }\n.app-container { border: 1px dashed #00ff00; padding: 25px; text-align: center; background: rgba(0,20,0,0.8); }\n#counter { font-size: 3rem; margin: 15px 0; color: #fff; }\nbutton { background: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 10px 20px; font-weight: bold; cursor: pointer; }\nbutton:hover { background: #00ff00; color: #000; }';
-        currentCode.js = 'var count = 0;\nfunction increment() {\n  count++;\n  document.getElementById("counter").innerText = count;\n}';
+    try {
+        var response = await fetch("https://ai-tek-finder.onrender.com/generate-app", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: prompt })
+        });
+
+        if (!response.ok) {
+            throw new Error("HTTP Status " + response.status);
+        }
+
+        var data = await response.json();
+
+        currentCode.html = data.html || "<div>Error parsing HTML</div>";
+        currentCode.css = data.css || "body { background: #000; color: #00ff00; }";
+        currentCode.js = data.js || "// No JS returned";
 
         document.getElementById('codeEditor').value = currentCode[activeTab];
         updatePreview();
 
-        document.getElementById('previewStatus').innerText = "● LIVE";
-        document.getElementById('previewStatus').style.color = "#00ff00";
-    }, 800);
+        statusElem.innerText = "● LIVE";
+        statusElem.style.color = "#00ff00";
+
+    } catch (err) {
+        console.error("Studio AI Generation Failed:", err);
+        
+        // Fallback card if offline
+        currentCode.html = '<div class="app-container">\n  <h2>' + prompt.toUpperCase() + '</h2>\n  <p>Connection Error to Backend Engine</p>\n</div>';
+        currentCode.css = 'body { background: #050505; color: #ff0000; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }\n.app-container { border: 1px dashed #ff0000; padding: 25px; text-align: center; }';
+        currentCode.js = '// Check Render connection';
+
+        document.getElementById('codeEditor').value = currentCode[activeTab];
+        updatePreview();
+
+        statusElem.innerText = "● OFFLINE / FALLBACK";
+        statusElem.style.color = "#ff0000";
+    }
 }
 
 function loadPreset(type) {
