@@ -70,13 +70,13 @@ def generate_app():
         
         system_instruction = (
             "You are the NEXUS AI Application Generator engine. "
-            "Build a full web app from the user request. "
-            "Return ONLY a JSON object with 3 keys: 'html', 'css', and 'js'.\n\n"
-            "RULES:\n"
-            "1. Output valid JSON only (no markdown wrapping, no ```json or ```).\n"
-            "2. If building a Canvas game, ensure the <canvas> element in 'html' includes explicit width and height attributes (e.g., width='400' height='500') and that the ID matches 'js' exactly.\n"
-            "3. 'css' must center elements and provide a clean dark-themed background.\n"
-            "4. 'js' must contain full, complete interactive logic without missing variable declarations."
+            "Build a full, highly interactive single-page web app from the user request. "
+            "Return ONLY a valid JSON object with 3 keys: 'html', 'css', and 'js'.\n\n"
+            "STRICT CODE SEPARATION RULES:\n"
+            "1. 'html': Do NOT include <!DOCTYPE>, <html>, <head>, <body>, <style>, or <script> tags. Provide strictly the inner DOM elements (e.g., <canvas id='gameCanvas' width='400' height='500'></canvas><div id='ui'></div>).\n"
+            "2. 'css': Provide full, beautiful styling here (neon synthwave colors, dark backgrounds, canvas borders, fonts). Do NOT embed CSS inside HTML.\n"
+            "3. 'js': Provide complete interactive JavaScript here. Bind click, keydown, and touch event listeners properly to the canvas or window for starting, jumping, and restarting the game loop cleanly.\n"
+            "4. Do NOT output markdown backticks (```json)."
         )
 
         models_to_try = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
@@ -93,18 +93,16 @@ def generate_app():
                     "temperature": 0.2
                 }
 
-                res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=20)
+                res = requests.post("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)", headers=headers, json=payload, timeout=20)
                 
                 if res.status_code == 200:
                     result_json = res.json()
                     content_text = result_json['choices'][0]['message']['content'].strip()
                     
-                    # Clean out markdown block wrappers if present
                     if content_text.startswith("```"):
                         content_text = re.sub(r'^```(?:json)?\n?', '', content_text)
                         content_text = re.sub(r'\n?```$', '', content_text).strip()
 
-                    # Handle control characters (\n, \t) inside raw model JSON output safely
                     try:
                         app_data = json.loads(content_text)
                     except json.JSONDecodeError:
@@ -121,7 +119,7 @@ def generate_app():
             except Exception as e:
                 print(f"Groq API Exception for {model_id}: {str(e)}")
 
-    # FALLBACK ENGINE IF ALL ELSE FAILS
+    # FALLBACK ENGINE
     title_clean = prompt.upper()
     fallback_html = f"""<div class="app-card">
   <h2>{title_clean}</h2>
@@ -134,40 +132,16 @@ def generate_app():
   </div>
 </div>"""
 
-    fallback_css = """body {
-  background: #050505; color: #00ff00;
-  font-family: 'Courier New', monospace;
-  display: flex; justify-content: center; align-items: center;
-  height: 100vh; margin: 0;
-}
-.app-card {
-  border: 1px dashed #00ff00; padding: 30px;
-  background: rgba(0,20,0,0.85); text-align: center;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-}
+    fallback_css = """body { background: #050505; color: #00ff00; font-family: monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+.app-card { border: 1px dashed #00ff00; padding: 30px; background: rgba(0,20,0,0.85); text-align: center; }
 #display-val { font-size: 3.5rem; margin: 20px 0; color: #fff; font-weight: bold; }
-.btn-group { display: flex; gap: 10px; justify-content: center; }
-button {
-  background: transparent; color: #00ff00; border: 1px solid #00ff00;
-  padding: 10px 15px; font-family: monospace; font-weight: bold; cursor: pointer;
-}
-button:hover { background: #00ff00; color: #000; }"""
+button { background: transparent; color: #00ff00; border: 1px solid #00ff00; padding: 10px 15px; font-weight: bold; cursor: pointer; }"""
 
     fallback_js = """var count = 0;
-function updateVal(amt) {
-  count += amt;
-  document.getElementById('display-val').innerText = count;
-}
-function resetVal() {
-  count = 0;
-  document.getElementById('display-val').innerText = count;
-}"""
+function updateVal(amt) { count += amt; document.getElementById('display-val').innerText = count; }
+function resetVal() { count = 0; document.getElementById('display-val').innerText = count; }"""
 
-    return jsonify({
-        "html": fallback_html,
-        "css": fallback_css,
-        "js": fallback_js
-    })
+    return jsonify({"html": fallback_html, "css": fallback_css, "js": fallback_js})
 
 # -------------------------------------------------------------
 # ROUTE: Core Search Engine
@@ -183,7 +157,7 @@ def search():
         clean_keyword = query.lower().replace('apk', '').strip()
         encoded_keyword = urllib.parse.quote(clean_keyword)
         
-        search_url = f"[https://html.duckduckgo.com/html/?q=](https://html.duckduckgo.com/html/?q=){encoded_keyword}+apk"
+        search_url = f"https://html.duckduckgo.com/html/?q={encoded_keyword}+apk"
         try:
             headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
             response = requests.get(search_url, headers=headers, timeout=10)
@@ -192,9 +166,9 @@ def search():
             
             if not links:
                 links = [
-                    f"[https://www.apkmirror.com/?searchtype=apk&s=](https://www.apkmirror.com/?searchtype=apk&s=){encoded_keyword}",
-                    f"[https://apkpure.com/search?q=](https://apkpure.com/search?q=){encoded_keyword}",
-                    f"[https://github.com/search?q=](https://github.com/search?q=){encoded_keyword}+apk"
+                    f"https://www.apkmirror.com/?searchtype=apk&s={encoded_keyword}",
+                    f"https://apkpure.com/search?q={encoded_keyword}",
+                    f"https://github.com/search?q={encoded_keyword}+apk"
                 ]
             
             results_html = f"<span style='color: #00ff00;'>[+] GLOBAL NETWORK QUERY: '{clean_keyword.upper()}'</span><br><br>"
@@ -220,7 +194,7 @@ def search():
 
     else:
         log_search(query, "GITHUB_REPO")
-        gh_search_url = f"[https://api.github.com/search/repositories?q=](https://api.github.com/search/repositories?q=){urllib.parse.quote(query)}&sort=stars&order=desc&per_page=3"
+        gh_search_url = f"https://api.github.com/search/repositories?q={urllib.parse.quote(query)}&sort=stars&order=desc&per_page=3"
         headers = {"Accept": "application/vnd.github.v3+json", "User-Agent": "TEKFINDER-Core"}
         
         github_token = os.environ.get('GITHUB_TOKEN')
@@ -284,13 +258,13 @@ def translate_code():
 
 @app.route('/trending', methods=['GET'])
 def get_trending():
-    return jsonify({"items": [{"name": "React", "html_url": "[https://github.com/facebook/react](https://github.com/facebook/react)", "description": "A declarative, efficient UI library.", "stargazers_count": 210000, "language": "JavaScript"}]})
+    return jsonify({"items": [{"name": "React", "html_url": "https://github.com/facebook/react", "description": "A declarative, efficient UI library.", "stargazers_count": 210000, "language": "JavaScript"}]})
 
 @app.route('/find-apis', methods=['GET'])
 def find_apis():
     query = request.args.get('query', '').strip().lower()
     log_search(query or "random_apicall", "PUBLIC_API")
-    return jsonify({"apis": [{"name": "Cat Facts API", "url": "[https://catfact.ninja/fact](https://catfact.ninja/fact)", "description": "Daily cat facts.", "category": "Animals"}]})
+    return jsonify({"apis": [{"name": "Cat Facts API", "url": "https://catfact.ninja/fact", "description": "Daily cat facts.", "category": "Animals"}]})
 
 # -------------------------------------------------------------
 # ROUTE: Admin Tracking & Metrics Endpoint
