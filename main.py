@@ -93,7 +93,7 @@ def generate_app():
                     "temperature": 0.2
                 }
 
-                res = requests.post("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)", headers=headers, json=payload, timeout=20)
+                res = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=payload, timeout=20)
                 
                 if res.status_code == 200:
                     result_json = res.json()
