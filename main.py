@@ -40,7 +40,14 @@ def escape_html(text):
     return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 # -------------------------------------------------------------
-# ROUTE: NEXUS Studio AI App Generator Engine (Direct REST API)
+# ROUTE: Root Health Check
+# -------------------------------------------------------------
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return jsonify({"status": "NEXUS Core System Operational", "version": "v3.0"}), 200
+
+# -------------------------------------------------------------
+# ROUTE: NEXUS Studio AI App Generator Engine (Groq REST API)
 # -------------------------------------------------------------
 @app.route('/generate-app', methods=['POST'])
 def generate_app():
@@ -54,7 +61,7 @@ def generate_app():
 
     groq_api_key = os.environ.get('GROQ_API_KEY')
 
-    # IF GROQ API KEY IS SET: USE DIRECT REST API CALL TO GROQ
+    # IF GROQ API KEY IS SET: USE DIRECT REST API CALL
     if groq_api_key:
         try:
             headers = {
@@ -102,7 +109,7 @@ def generate_app():
         except Exception as e:
             print("Groq API Request Exception:", str(e))
 
-    # FALLBACK ENGINE IF GROQ KEY IS MISSING OR API FAILS
+    # FALLBACK ENGINE IF KEY NOT SET OR API FAILS
     title_clean = prompt.upper()
     fallback_html = f"""<div class="app-card">
   <h2>{title_clean}</h2>
